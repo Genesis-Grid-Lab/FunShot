@@ -1,34 +1,296 @@
 #pragma once
 #include "Core.h"
 
-class Mesh {
+class Mesh{
 public:
-    Mesh();
-    ~Mesh();
-
-    //load/unload mesh
-    bool Load(const std::string& fileName, class Renderer* renderer);
-    void Unload();
-    //Get the vertex array associated with this mesh
-    class VertexArray* GetVertexArray(){ return mVertexArray;}
-    // Get a texture from specified index
-    class Texture2D* GetTexture(size_t index);
-    //Get name of shader
-    const std::string& GetShaderName() const { return mShaderName;}
-    //Get object space bounding sphere radius
-    float GetRadius() const { return mRadius;}
-    //Get specular power of mesh
-    float GetSpecPower() const { return mSpecPower;}
-
+	Mesh();
+	~Mesh();
+	// Load/unload mesh
+	bool Load(const std::string& fileName, class Renderer* renderer);
+	void Unload();
+	// Get the vertex array associated with this mesh
+	class VertexArray* GetVertexArray() { return mVertexArray; }
+	// Get a texture from specified index
+	class Texture2D* GetTexture(size_t index);
+	// Get name of shader
+	const std::string& GetShaderName() const { return mShaderName; }
+	// Get object space bounding sphere radius
+	float GetRadius() const { return mRadius; }
+	// Get specular power of mesh
+	float GetSpecPower() const { return mSpecPower; }
 private:
-    //Texture associated with this mesh
-    std::vector<class Texture2D*> mTextures;
-    //Vertex array associated with this mesh
-    class VertexArray* mVertexArray;
-    //Name of shader specified by mesh
-    std::string mShaderName;
-    //store object space bounding radius
-    float mRadius;
-    //Specular power of surface
-    float mSpecPower;
+	// Textures associated with this mesh
+	std::vector<class Texture2D*> mTextures;
+	// Vertex array associated with this mesh
+	class VertexArray* mVertexArray;
+	// Name of shader specified by mesh
+	std::string mShaderName;
+	// Stores object space bounding sphere radius
+	float mRadius;
+	// Specular power of surface
+	float mSpecPower;
+};
+
+namespace Math
+{
+	const float Pi = 3.1415926535f;
+	const float TwoPi = Pi * 2.0f;
+	const float PiOver2 = Pi / 2.0f;
+	const float Infinity = std::numeric_limits<float>::infinity();
+	const float NegInfinity = -std::numeric_limits<float>::infinity();
+
+	inline float ToRadians(float degrees)
+	{
+		return degrees * Pi / 180.0f;
+	}
+
+	inline float ToDegrees(float radians)
+	{
+		return radians * 180.0f / Pi;
+	}
+
+	inline bool NearZero(float val, float epsilon = 0.001f)
+	{
+		if (fabs(val) <= epsilon)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	template <typename T>
+	T Max(const T& a, const T& b)
+	{
+		return (a < b ? b : a);
+	}
+
+	template <typename T>
+	T Min(const T& a, const T& b)
+	{
+		return (a < b ? a : b);
+	}
+
+	template <typename T>
+	T Clamp(const T& value, const T& lower, const T& upper)
+	{
+		return Min(upper, Max(lower, value));
+	}
+
+	inline float Abs(float value)
+	{
+		return fabs(value);
+	}
+
+	inline float Cos(float angle)
+	{
+		return cosf(angle);
+	}
+
+	inline float Sin(float angle)
+	{
+		return sinf(angle);
+	}
+
+	inline float Tan(float angle)
+	{
+		return tanf(angle);
+	}
+
+	inline float Acos(float value)
+	{
+		return acosf(value);
+	}
+
+	inline float Atan2(float y, float x)
+	{
+		return atan2f(y, x);
+	}
+
+	inline float Cot(float angle)
+	{
+		return 1.0f / Tan(angle);
+	}
+
+	inline float Lerp(float a, float b, float f)
+	{
+		return a + f * (b - a);
+	}
+
+	inline float Sqrt(float value)
+	{
+		return sqrtf(value);
+	}
+
+	inline float Fmod(float numer, float denom)
+	{
+		return fmod(numer, denom);
+	}
+}
+
+class Vector3
+{
+public:
+	float x;
+	float y;
+	float z;
+
+	Vector3()
+		:x(0.0f)
+		,y(0.0f)
+		,z(0.0f)
+	{}
+
+	explicit Vector3(float inX, float inY, float inZ)
+		:x(inX)
+		,y(inY)
+		,z(inZ)
+	{}
+
+	// Cast to a const float pointer
+	const float* GetAsFloatPtr() const
+	{
+		return reinterpret_cast<const float*>(&x);
+	}
+
+	// Set all three components in one line
+	void Set(float inX, float inY, float inZ)
+	{
+		x = inX;
+		y = inY;
+		z = inZ;
+	}
+
+	// Vector addition (a + b)
+	friend Vector3 operator+(const Vector3& a, const Vector3& b)
+	{
+		return Vector3(a.x + b.x, a.y + b.y, a.z + b.z);
+	}
+
+	// Vector subtraction (a - b)
+	friend Vector3 operator-(const Vector3& a, const Vector3& b)
+	{
+		return Vector3(a.x - b.x, a.y - b.y, a.z - b.z);
+	}
+
+	// Component-wise multiplication
+	friend Vector3 operator*(const Vector3& left, const Vector3& right)
+	{
+		return Vector3(left.x * right.x, left.y * right.y, left.z * right.z);
+	}
+
+	// Scalar multiplication
+	friend Vector3 operator*(const Vector3& vec, float scalar)
+	{
+		return Vector3(vec.x * scalar, vec.y * scalar, vec.z * scalar);
+	}
+
+	// Scalar multiplication
+	friend Vector3 operator*(float scalar, const Vector3& vec)
+	{
+		return Vector3(vec.x * scalar, vec.y * scalar, vec.z * scalar);
+	}
+
+	// Scalar *=
+	Vector3& operator*=(float scalar)
+	{
+		x *= scalar;
+		y *= scalar;
+		z *= scalar;
+		return *this;
+	}
+
+	// Vector +=
+	Vector3& operator+=(const Vector3& right)
+	{
+		x += right.x;
+		y += right.y;
+		z += right.z;
+		return *this;
+	}
+
+	// Vector -=
+	Vector3& operator-=(const Vector3& right)
+	{
+		x -= right.x;
+		y -= right.y;
+		z -= right.z;
+		return *this;
+	}
+
+	// Length squared of vector
+	float LengthSq() const
+	{
+		return (x*x + y*y + z*z);
+	}
+
+	// Length of vector
+	float Length() const
+	{
+		return (Math::Sqrt(LengthSq()));
+	}
+
+	// Normalize this vector
+	void Normalize()
+	{
+		float length = Length();
+		x /= length;
+		y /= length;
+		z /= length;
+	}
+
+	// Normalize the provided vector
+	static Vector3 Normalize(const Vector3& vec)
+	{
+		Vector3 temp = vec;
+		temp.Normalize();
+		return temp;
+	}
+
+	// Dot product between two vectors (a dot b)
+	static float Dot(const Vector3& a, const Vector3& b)
+	{
+		return (a.x * b.x + a.y * b.y + a.z * b.z);
+	}
+
+	// Cross product between two vectors (a cross b)
+	static Vector3 Cross(const Vector3& a, const Vector3& b)
+	{
+		Vector3 temp;
+		temp.x = a.y * b.z - a.z * b.y;
+		temp.y = a.z * b.x - a.x * b.z;
+		temp.z = a.x * b.y - a.y * b.x;
+		return temp;
+	}
+
+	// Lerp from A to B by f
+	static Vector3 Lerp(const Vector3& a, const Vector3& b, float f)
+	{
+		return Vector3(a + f * (b - a));
+	}
+
+	// Reflect V about (normalized) N
+	static Vector3 Reflect(const Vector3& v, const Vector3& n)
+	{
+		return v - 2.0f * Vector3::Dot(v, n) * n;
+	}
+
+	static Vector3 Transform(const Vector3& vec, const class Matrix4& mat, float w = 1.0f);
+	// This will transform the vector and renormalize the w component
+	static Vector3 TransformWithPerspDiv(const Vector3& vec, const class Matrix4& mat, float w = 1.0f);
+
+	// Transform a Vector3 by a quaternion
+	static Vector3 Transform(const Vector3& v, const class Quaternion& q);
+
+	static const Vector3 Zero;
+	static const Vector3 UnitX;
+	static const Vector3 UnitY;
+	static const Vector3 UnitZ;
+	static const Vector3 NegUnitX;
+	static const Vector3 NegUnitY;
+	static const Vector3 NegUnitZ;
+	static const Vector3 Infinity;
+	static const Vector3 NegInfinity;
 };
