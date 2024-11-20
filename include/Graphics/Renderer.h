@@ -14,7 +14,7 @@ class Renderer{
 public:
     Renderer(class Game* game);
     ~Renderer();
-    
+
     bool Init(float screenWidth, float screenHeight);
     void Shutdown();
     void UnloadData();
@@ -37,6 +37,9 @@ private:
     void CreateSpriteVerts();
     void SetLightUniforms(class Shader* shader);
     glm::mat4 CreateSimpleViewProj(float width, float height);
+    glm::mat4 CreatePerspectiveFOV(float fovY, float width, float height, float near, float far);
+    glm::mat4 CreateLookAt(const glm::vec3& eye, const glm::vec3& target, const glm::vec3& up);
+    float Cot(float angle);
 
     //sprite shader
     class Shader* mSpriteShader;

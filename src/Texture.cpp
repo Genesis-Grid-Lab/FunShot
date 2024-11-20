@@ -1,29 +1,63 @@
 #include "Texture.h"
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
 Texture2D::Texture2D()
-    : Width(0), Height(0), Internal_Format(GL_RGB), Image_Format(GL_RGB), Wrap_S(GL_REPEAT), Wrap_T(GL_REPEAT), Filter_Min(GL_LINEAR), Filter_Max(GL_LINEAR)
+:mTextureID(0)
+,mWidth(0)
+,mHeight(0)
 {
-    glGenTextures(1, &this->ID);
+
 }
 
-void Texture2D::Generate(unsigned int width, unsigned int height, unsigned char* data)
+Texture2D::~Texture2D()
 {
-    this->Width = width;
-    this->Height = height;
-    // create Texture
-    glBindTexture(GL_TEXTURE_2D, this->ID);
-    glTexImage2D(GL_TEXTURE_2D, 0, this->Internal_Format, width, height, 0, this->Image_Format, GL_UNSIGNED_BYTE, data);
-    // set Texture wrap and filter modes
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, this->Wrap_S);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, this->Wrap_T);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, this->Filter_Min);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, this->Filter_Max);
-    // unbind texture
-    glBindTexture(GL_TEXTURE_2D, 0);
+
 }
 
-void Texture2D::Bind() const
+bool Texture2D::Load(const std::string& fileName)
 {
-    glBindTexture(GL_TEXTURE_2D, this->ID);
+	int channels = 0;
+
+	unsigned char* image = stbi_load(fileName.c_str(),
+										   &mWidth, &mHeight, &channels, STBI_rgb_alpha);
+
+	if (image == nullptr)
+	{
+		FN_ERROR("SOIL failed to load image {}: {}", fileName.c_str());
+		return false;
+	}
+
+	int format = GL_RGB;
+	if (channels == 4)
+	{
+		format = GL_RGBA; FN_INFO("rgba");
+	}
+	else{
+	   FN_INFO("rgb");
+	}
+
+	glGenTextures(1, &mTextureID);
+	glBindTexture(GL_TEXTURE_2D, mTextureID);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, format, mWidth, mHeight, 0, format,
+				 GL_UNSIGNED_BYTE, image);
+
+	stbi_image_free(image);
+
+	// Enable linear filtering
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	return true;
 }
 
+void Texture2D::Unload()
+{
+	glDeleteTextures(1, &mTextureID);
+}
+
+void Texture2D::SetActive()
+{
+	glBindTexture(GL_TEXTURE_2D, mTextureID);
+}
