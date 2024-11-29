@@ -2,7 +2,6 @@
 #define ENTT_LIB_META_PLUGIN_TYPES_H
 
 #include <entt/locator/locator.hpp>
-#include <entt/meta/context.hpp>
 #include <entt/meta/meta.hpp>
 
 struct userdata {

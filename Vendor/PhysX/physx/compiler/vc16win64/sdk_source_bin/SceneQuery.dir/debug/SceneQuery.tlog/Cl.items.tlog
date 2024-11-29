@@ -1,0 +1,15 @@
+D:\Playground\FunShot\Vendor\PhysX\physx\source\scenequery\src\SqAABBPruner.cpp;D:\Playground\FunShot\Vendor\PhysX\physx\compiler\vc16win64\sdk_source_bin\SceneQuery.dir\debug\SqAABBPruner.obj
+D:\Playground\FunShot\Vendor\PhysX\physx\source\scenequery\src\SqAABBTree.cpp;D:\Playground\FunShot\Vendor\PhysX\physx\compiler\vc16win64\sdk_source_bin\SceneQuery.dir\debug\SqAABBTree.obj
+D:\Playground\FunShot\Vendor\PhysX\physx\source\scenequery\src\SqIncrementalAABBPruner.cpp;D:\Playground\FunShot\Vendor\PhysX\physx\compiler\vc16win64\sdk_source_bin\SceneQuery.dir\debug\SqIncrementalAABBPruner.obj
+D:\Playground\FunShot\Vendor\PhysX\physx\source\scenequery\src\SqIncrementalAABBPrunerCore.cpp;D:\Playground\FunShot\Vendor\PhysX\physx\compiler\vc16win64\sdk_source_bin\SceneQuery.dir\debug\SqIncrementalAABBPrunerCore.obj
+D:\Playground\FunShot\Vendor\PhysX\physx\source\scenequery\src\SqIncrementalAABBTree.cpp;D:\Playground\FunShot\Vendor\PhysX\physx\compiler\vc16win64\sdk_source_bin\SceneQuery.dir\debug\SqIncrementalAABBTree.obj
+D:\Playground\FunShot\Vendor\PhysX\physx\source\scenequery\src\SqAABBTreeUpdateMap.cpp;D:\Playground\FunShot\Vendor\PhysX\physx\compiler\vc16win64\sdk_source_bin\SceneQuery.dir\debug\SqAABBTreeUpdateMap.obj
+D:\Playground\FunShot\Vendor\PhysX\physx\source\scenequery\src\SqBounds.cpp;D:\Playground\FunShot\Vendor\PhysX\physx\compiler\vc16win64\sdk_source_bin\SceneQuery.dir\debug\SqBounds.obj
+D:\Playground\FunShot\Vendor\PhysX\physx\source\scenequery\src\SqCompoundPruner.cpp;D:\Playground\FunShot\Vendor\PhysX\physx\compiler\vc16win64\sdk_source_bin\SceneQuery.dir\debug\SqCompoundPruner.obj
+D:\Playground\FunShot\Vendor\PhysX\physx\source\scenequery\src\SqCompoundPruningPool.cpp;D:\Playground\FunShot\Vendor\PhysX\physx\compiler\vc16win64\sdk_source_bin\SceneQuery.dir\debug\SqCompoundPruningPool.obj
+D:\Playground\FunShot\Vendor\PhysX\physx\source\scenequery\src\SqBucketPruner.cpp;D:\Playground\FunShot\Vendor\PhysX\physx\compiler\vc16win64\sdk_source_bin\SceneQuery.dir\debug\SqBucketPruner.obj
+D:\Playground\FunShot\Vendor\PhysX\physx\source\scenequery\src\SqExtendedBucketPruner.cpp;D:\Playground\FunShot\Vendor\PhysX\physx\compiler\vc16win64\sdk_source_bin\SceneQuery.dir\debug\SqExtendedBucketPruner.obj
+D:\Playground\FunShot\Vendor\PhysX\physx\source\scenequery\src\SqMetaData.cpp;D:\Playground\FunShot\Vendor\PhysX\physx\compiler\vc16win64\sdk_source_bin\SceneQuery.dir\debug\SqMetaData.obj
+D:\Playground\FunShot\Vendor\PhysX\physx\source\scenequery\src\SqPruningPool.cpp;D:\Playground\FunShot\Vendor\PhysX\physx\compiler\vc16win64\sdk_source_bin\SceneQuery.dir\debug\SqPruningPool.obj
+D:\Playground\FunShot\Vendor\PhysX\physx\source\scenequery\src\SqPruningStructure.cpp;D:\Playground\FunShot\Vendor\PhysX\physx\compiler\vc16win64\sdk_source_bin\SceneQuery.dir\debug\SqPruningStructure.obj
+D:\Playground\FunShot\Vendor\PhysX\physx\source\scenequery\src\SqSceneQueryManager.cpp;D:\Playground\FunShot\Vendor\PhysX\physx\compiler\vc16win64\sdk_source_bin\SceneQuery.dir\debug\SqSceneQueryManager.obj

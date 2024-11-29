@@ -20,7 +20,11 @@
 
 namespace entt {
 
-/*! @cond TURN_OFF_DOXYGEN */
+/**
+ * @cond TURN_OFF_DOXYGEN
+ * Internal details not to be documented.
+ */
+
 namespace internal {
 
 template<typename Key, typename Type>
@@ -65,7 +69,6 @@ public:
     using reference = value_type;
     using difference_type = std::ptrdiff_t;
     using iterator_category = std::input_iterator_tag;
-    using iterator_concept = std::random_access_iterator_tag;
 
     constexpr dense_map_iterator() noexcept
         : it{} {}
@@ -187,7 +190,6 @@ public:
     using reference = value_type;
     using difference_type = std::ptrdiff_t;
     using iterator_category = std::input_iterator_tag;
-    using iterator_concept = std::forward_iterator_tag;
 
     constexpr dense_map_local_iterator() noexcept
         : it{},
@@ -239,7 +241,11 @@ template<typename Lhs, typename Rhs>
 }
 
 } // namespace internal
-/*! @endcond */
+
+/**
+ * Internal details not to be documented.
+ * @endcond
+ */
 
 /**
  * @brief Associative container for key-value pairs with unique keys.
@@ -983,7 +989,7 @@ public:
             sparse.first().resize(sz);
 
             for(auto &&elem: sparse.first()) {
-                elem = (std::numeric_limits<size_type>::max)();
+                elem = std::numeric_limits<size_type>::max();
             }
 
             for(size_type pos{}, last = size(); pos < last; ++pos) {
@@ -1027,7 +1033,11 @@ private:
 
 } // namespace entt
 
-/*! @cond TURN_OFF_DOXYGEN */
+/**
+ * @cond TURN_OFF_DOXYGEN
+ * Internal details not to be documented.
+ */
+
 namespace std {
 
 template<typename Key, typename Value, typename Allocator>
@@ -1035,6 +1045,10 @@ struct uses_allocator<entt::internal::dense_map_node<Key, Value>, Allocator>
     : std::true_type {};
 
 } // namespace std
-/*! @endcond */
+
+/**
+ * Internal details not to be documented.
+ * @endcond
+ */
 
 #endif

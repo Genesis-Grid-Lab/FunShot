@@ -2,7 +2,6 @@
 #include <gtest/gtest.h>
 #include <entt/core/hashed_string.hpp>
 #include <entt/locator/locator.hpp>
-#include <entt/meta/context.hpp>
 #include <entt/meta/factory.hpp>
 #include <entt/meta/meta.hpp>
 #include <entt/meta/node.hpp>
@@ -62,7 +61,7 @@ struct MetaBase: ::testing::Test {
 
 TEST_F(MetaBase, Functionalities) {
     auto any = entt::resolve<derived_t>().construct();
-    any.cast<derived_t &>().value_1 = 42; // NOLINT
+    any.cast<derived_t &>().value_1 = 42;
     auto as_derived = any.as_ref();
 
     ASSERT_TRUE(any.allow_cast<base_1_t &>());
@@ -120,7 +119,7 @@ TEST_F(MetaBase, ConvWithMutatingThis) {
     entt::meta_any any{derived_t{}};
     auto &&ref = any.cast<derived_t &>();
     auto as_cref = std::as_const(any).as_ref();
-    ref.value_2 = 42; // NOLINT
+    ref.value_2 = 42;
 
     auto conv = std::as_const(any).allow_cast<int>();
     auto from_cref = std::as_const(as_cref).allow_cast<int>();
@@ -140,7 +139,7 @@ TEST_F(MetaBase, ConvWithMutatingThis) {
 TEST_F(MetaBase, OpaqueConvWithMutatingThis) {
     entt::meta_any any{derived_t{}};
     auto as_cref = std::as_const(any).as_ref();
-    any.cast<derived_t &>().value_2 = 42; // NOLINT
+    any.cast<derived_t &>().value_2 = 42;
 
     auto conv = std::as_const(any).allow_cast(entt::resolve<int>());
     auto from_cref = std::as_const(as_cref).allow_cast(entt::resolve<int>());
@@ -164,7 +163,7 @@ TEST_F(MetaBase, AssignWithMutatingThis) {
     entt::meta_any src{derived_t{}};
 
     dst.cast<base_2_t &>().value_2 = 0;
-    src.cast<derived_t &>().value_2 = 42; // NOLINT
+    src.cast<derived_t &>().value_2 = 42;
 
     ASSERT_TRUE(dst.assign(src));
     ASSERT_EQ(dst.get("value_2"_hs).cast<int>(), 42);
@@ -177,7 +176,7 @@ TEST_F(MetaBase, TransferWithMutatingThis) {
     entt::meta_any src{derived_t{}};
 
     dst.cast<base_2_t &>().value_2 = 0;
-    src.cast<derived_t &>().value_2 = 42; // NOLINT
+    src.cast<derived_t &>().value_2 = 42;
 
     ASSERT_TRUE(dst.assign(std::move(src)));
     ASSERT_EQ(dst.get("value_2"_hs).cast<int>(), 42);

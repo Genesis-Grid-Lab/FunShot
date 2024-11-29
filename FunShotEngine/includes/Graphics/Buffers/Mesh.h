@@ -1,0 +1,114 @@
+#pragma once
+#include "Vertex.h"
+
+namespace Gen
+{
+	template <typename Vertex> struct Mesh
+	{
+		GEN_INLINE Mesh(MeshData<Vertex>& data) 
+		{
+			// check vertices
+			if(data.Vertices.empty())
+            {
+                GEN_ERROR("empty mesh data!");
+                return;
+            }
+
+			// number of vertices and indices
+			m_NbrVertex = data.Vertices.size();
+			m_NbrIndex = data.Indices.size();
+
+			// generate vrtex buffer array
+			glGenVertexArrays(1, &m_BufferID);
+
+			// activate/bind vertex array
+			glBindVertexArray(m_BufferID);
+
+			// create vertex buffer
+			uint32_t VBO = 0u;
+			glGenBuffers(1, &VBO);
+			glBindBuffer(GL_ARRAY_BUFFER, VBO);
+			glBufferData(GL_ARRAY_BUFFER, m_NbrVertex * 
+			sizeof(Vertex), data.Vertices.data(), GL_STATIC_DRAW);
+
+			// create index buffer 
+			if(m_NbrIndex != 0u) 
+			{
+				uint32_t EBO = 0u;
+				glGenBuffers(1, &EBO);
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+				glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_NbrIndex * 
+				sizeof(uint32_t), data.Indices.data(), GL_STATIC_DRAW);
+			}
+
+			// handle vertex types
+			if (TypeID<Vertex>() == TypeID<ShadedVertex>()) 
+			{
+				SetAttribute(0, 3, (void*)offsetof(ShadedVertex, Position));
+				SetAttribute(1, 3, (void*)offsetof(ShadedVertex, Normal));
+				SetAttribute(2, 2, (void*)offsetof(ShadedVertex, UVs));
+				SetAttribute(3, 3, (void*)offsetof(ShadedVertex, Tangent));
+				SetAttribute(4, 3, (void*)offsetof(ShadedVertex, Bitangent));
+			}
+			else if (TypeID<Vertex>() == TypeID<SkeletalVertex>()) 
+			{
+				SetAttribute(0, 3, (void*)offsetof(SkeletalVertex, Position));
+				SetAttribute(1, 3, (void*)offsetof(SkeletalVertex, Normal));
+				SetAttribute(2, 2, (void*)offsetof(SkeletalVertex, UVs));
+				SetAttribute(3, 3, (void*)offsetof(SkeletalVertex, Tangent));
+				SetAttribute(4, 3, (void*)offsetof(SkeletalVertex, Bitangent));
+				SetAttribute(5, 4, (void*)offsetof(SkeletalVertex, Joints));
+				SetAttribute(6, 4, (void*)offsetof(SkeletalVertex, Weights));
+			}			
+			else if (TypeID<Vertex>() == TypeID<QuadVertex>()) 
+			{
+				SetAttribute(0, 4, (void*)offsetof(QuadVertex, Data));
+			}	
+			else if (TypeID<Vertex>() == TypeID<SkyboxVertex>()) 
+			{
+				SetAttribute(0, 3, (void*)offsetof(SkyboxVertex, Position));
+			}
+			else 
+			{
+				GEN_ERROR("invalid vertex type!");
+			}
+
+			// unbind vertext array
+			glBindVertexArray(0);
+		}
+       	
+		GEN_INLINE void Draw(uint32_t mode) 
+		{
+			glBindVertexArray(m_BufferID);
+			if(m_NbrIndex != 0u) 
+			{
+				GLCheck(glDrawElements(mode, m_NbrIndex, GL_UNSIGNED_INT, 0);)
+				glBindVertexArray(0);
+				return;
+			}
+			GLCheck(glDrawArrays(mode, 0, m_NbrVertex);)
+			glBindVertexArray(0);
+		}
+
+        GEN_INLINE ~Mesh() 
+		{ 
+			glDeleteVertexArrays(1, &m_BufferID); 
+		}	
+
+    private:
+        GEN_INLINE void SetAttribute(uint32_t index, int32_t size, const void* value) 
+		{
+			glEnableVertexAttribArray(index);
+			glVertexAttribPointer(index, size, GL_FLOAT, GL_FALSE, sizeof(Vertex), value);
+		}
+
+	private:
+		uint32_t m_NbrVertex = 0u;
+		uint32_t m_NbrIndex = 0u;
+		uint32_t m_BufferID = 0u;
+	};
+
+	// 3d mesh
+    using SkeletalMesh = Mesh<SkeletalVertex>;
+    using ShadedMesh = Mesh<ShadedVertex>;
+}

@@ -1,14 +1,12 @@
 #include <gtest/gtest.h>
 #include <entt/core/attribute.h>
 #include <entt/core/hashed_string.hpp>
-#include <entt/locator/locator.hpp>
-#include <entt/meta/context.hpp>
 #include <entt/meta/factory.hpp>
 #include <entt/meta/meta.hpp>
 #include <entt/meta/resolve.hpp>
 #include "../common/types.h"
 
-ENTT_API void share(const entt::locator<entt::meta_ctx>::node_type &);
+ENTT_API void share(entt::locator<entt::meta_ctx>::node_type);
 ENTT_API void set_up();
 ENTT_API void tear_down();
 ENTT_API entt::meta_any wrap_int(int);

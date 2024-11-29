@@ -11,5 +11,3 @@ cpp.hint
 
 # Bazel
 /bazel-*
-/test/bazel-*
-/user.bazelrc

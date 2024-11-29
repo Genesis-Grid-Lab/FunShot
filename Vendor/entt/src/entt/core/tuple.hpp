@@ -7,7 +7,11 @@
 
 namespace entt {
 
-/*! @cond TURN_OFF_DOXYGEN */
+/**
+ * @cond TURN_OFF_DOXYGEN
+ * Internal details not to be documented.
+ */
+
 namespace internal {
 
 template<typename>
@@ -17,7 +21,11 @@ template<typename... Args>
 struct is_tuple_impl<std::tuple<Args...>>: std::true_type {};
 
 } // namespace internal
-/*! @endcond */
+
+/**
+ * Internal details not to be documented.
+ * @endcond
+ */
 
 /**
  * @brief Provides the member constant `value` to true if a given type is a

@@ -17,7 +17,7 @@ namespace entt {
  */
 template<std::size_t N>
 struct choice_t
-    // unfortunately, doxygen cannot parse such a construct
+    // Unfortunately, doxygen cannot parse such a construct.
     : /*! @cond TURN_OFF_DOXYGEN */ choice_t<N - 1> /*! @endcond */
 {};
 
@@ -250,40 +250,37 @@ struct type_list_cat<type_list<Type...>> {
 template<typename... List>
 using type_list_cat_t = typename type_list_cat<List...>::type;
 
-/*! @cond TURN_OFF_DOXYGEN */
-namespace internal {
-
-template<typename...>
+/*! @brief Primary template isn't defined on purpose. */
+template<typename>
 struct type_list_unique;
-
-template<typename First, typename... Other, typename... Type>
-struct type_list_unique<type_list<First, Other...>, Type...>
-    : std::conditional_t<(std::is_same_v<First, Type> || ...), type_list_unique<type_list<Other...>, Type...>, type_list_unique<type_list<Other...>, Type..., First>> {};
-
-template<typename... Type>
-struct type_list_unique<type_list<>, Type...> {
-    using type = type_list<Type...>;
-};
-
-} // namespace internal
-/*! @endcond */
 
 /**
  * @brief Removes duplicates types from a type list.
- * @tparam List Type list.
+ * @tparam Type One of the types provided by the given type list.
+ * @tparam Other The other types provided by the given type list.
  */
-template<typename List>
-struct type_list_unique {
+template<typename Type, typename... Other>
+struct type_list_unique<type_list<Type, Other...>> {
     /*! @brief A type list without duplicate types. */
-    using type = typename internal::type_list_unique<List>::type;
+    using type = std::conditional_t<
+        (std::is_same_v<Type, Other> || ...),
+        typename type_list_unique<type_list<Other...>>::type,
+        type_list_cat_t<type_list<Type>, typename type_list_unique<type_list<Other...>>::type>>;
+};
+
+/*! @brief Removes duplicates types from a type list. */
+template<>
+struct type_list_unique<type_list<>> {
+    /*! @brief A type list without duplicate types. */
+    using type = type_list<>;
 };
 
 /**
  * @brief Helper type.
- * @tparam List Type list.
+ * @tparam Type A type list.
  */
-template<typename List>
-using type_list_unique_t = typename type_list_unique<List>::type;
+template<typename Type>
+using type_list_unique_t = typename type_list_unique<Type>::type;
 
 /**
  * @brief Provides the member constant `value` to true if a type list contains a
@@ -678,7 +675,11 @@ inline constexpr bool is_complete_v = is_complete<Type>::value;
 template<typename Type, typename = void>
 struct is_iterator: std::false_type {};
 
-/*! @cond TURN_OFF_DOXYGEN */
+/**
+ * @cond TURN_OFF_DOXYGEN
+ * Internal details not to be documented.
+ */
+
 namespace internal {
 
 template<typename, typename = void>
@@ -688,11 +689,15 @@ template<typename Type>
 struct has_iterator_category<Type, std::void_t<typename std::iterator_traits<Type>::iterator_category>>: std::true_type {};
 
 } // namespace internal
-/*! @endcond */
+
+/**
+ * Internal details not to be documented.
+ * @endcond
+ */
 
 /*! @copydoc is_iterator */
 template<typename Type>
-struct is_iterator<Type, std::enable_if_t<!std::is_void_v<std::remove_cv_t<std::remove_pointer_t<Type>>>>>
+struct is_iterator<Type, std::enable_if_t<!std::is_same_v<std::remove_cv_t<std::remove_pointer_t<Type>>, void>>>
     : internal::has_iterator_category<Type> {};
 
 /**
@@ -737,7 +742,19 @@ struct is_transparent<Type, std::void_t<typename Type::is_transparent>>: std::tr
 template<typename Type>
 inline constexpr bool is_transparent_v = is_transparent<Type>::value;
 
-/*! @cond TURN_OFF_DOXYGEN */
+/**
+ * @brief Provides the member constant `value` to true if a given type is
+ * equality comparable, false otherwise.
+ * @tparam Type The type to test.
+ */
+template<typename Type, typename = void>
+struct is_equality_comparable: std::false_type {};
+
+/**
+ * @cond TURN_OFF_DOXYGEN
+ * Internal details not to be documented.
+ */
+
 namespace internal {
 
 template<typename, typename = void>
@@ -746,69 +763,51 @@ struct has_tuple_size_value: std::false_type {};
 template<typename Type>
 struct has_tuple_size_value<Type, std::void_t<decltype(std::tuple_size<const Type>::value)>>: std::true_type {};
 
-template<typename, typename = void>
-struct has_value_type: std::false_type {};
-
-template<typename Type>
-struct has_value_type<Type, std::void_t<typename Type::value_type>>: std::true_type {};
-
-template<typename>
-[[nodiscard]] constexpr bool dispatch_is_equality_comparable();
-
 template<typename Type, std::size_t... Index>
 [[nodiscard]] constexpr bool unpack_maybe_equality_comparable(std::index_sequence<Index...>) {
-    return (dispatch_is_equality_comparable<std::tuple_element_t<Index, Type>>() && ...);
+    return (is_equality_comparable<std::tuple_element_t<Index, Type>>::value && ...);
 }
 
 template<typename>
-[[nodiscard]] constexpr bool maybe_equality_comparable(char) {
-    return false;
-}
-
-template<typename Type>
-[[nodiscard]] constexpr auto maybe_equality_comparable(int) -> decltype(std::declval<Type>() == std::declval<Type>()) {
+[[nodiscard]] constexpr bool maybe_equality_comparable(choice_t<0>) {
     return true;
 }
 
 template<typename Type>
-[[nodiscard]] constexpr bool dispatch_is_equality_comparable() {
-    if constexpr(std::is_array_v<Type>) {
-        return false;
-    } else if constexpr(is_iterator_v<Type>) {
-        return maybe_equality_comparable<Type>(0);
-    } else if constexpr(has_value_type<Type>::value) {
-        if constexpr(std::is_same_v<typename Type::value_type, Type>) {
-            return maybe_equality_comparable<Type>(0);
-        } else if constexpr(dispatch_is_equality_comparable<typename Type::value_type>()) {
-            return maybe_equality_comparable<Type>(0);
-        } else {
-            return false;
-        }
-    } else if constexpr(is_complete_v<std::tuple_size<std::remove_cv_t<Type>>>) {
-        if constexpr(has_tuple_size_value<Type>::value) {
-            return maybe_equality_comparable<Type>(0) && unpack_maybe_equality_comparable<Type>(std::make_index_sequence<std::tuple_size<Type>::value>{});
-        } else {
-            return maybe_equality_comparable<Type>(0);
-        }
+[[nodiscard]] constexpr auto maybe_equality_comparable(choice_t<1>) -> decltype(std::declval<typename Type::value_type>(), bool{}) {
+    if constexpr(is_iterator_v<Type>) {
+        return true;
+    } else if constexpr(std::is_same_v<typename Type::value_type, Type>) {
+        return maybe_equality_comparable<Type>(choice<0>);
     } else {
-        return maybe_equality_comparable<Type>(0);
+        return is_equality_comparable<typename Type::value_type>::value;
+    }
+}
+
+template<typename Type>
+[[nodiscard]] constexpr std::enable_if_t<is_complete_v<std::tuple_size<std::remove_cv_t<Type>>>, bool> maybe_equality_comparable(choice_t<2>) {
+    if constexpr(has_tuple_size_value<Type>::value) {
+        return unpack_maybe_equality_comparable<Type>(std::make_index_sequence<std::tuple_size<Type>::value>{});
+    } else {
+        return maybe_equality_comparable<Type>(choice<1>);
     }
 }
 
 } // namespace internal
-/*! @endcond */
 
 /**
- * @brief Provides the member constant `value` to true if a given type is
- * equality comparable, false otherwise.
- * @tparam Type The type to test.
+ * Internal details not to be documented.
+ * @endcond
  */
-template<typename Type>
-struct is_equality_comparable: std::bool_constant<internal::dispatch_is_equality_comparable<Type>()> {};
 
 /*! @copydoc is_equality_comparable */
 template<typename Type>
-struct is_equality_comparable<const Type>: is_equality_comparable<Type> {};
+struct is_equality_comparable<Type, std::void_t<decltype(std::declval<Type>() == std::declval<Type>())>>
+    : std::bool_constant<internal::maybe_equality_comparable<Type>(choice<2>)> {};
+
+/*! @copydoc is_equality_comparable */
+template<typename Type, auto N>
+struct is_equality_comparable<Type[N]>: std::false_type {};
 
 /**
  * @brief Helper variable template.
@@ -875,9 +874,9 @@ using member_class_t = typename member_class<Member>::type;
 /**
  * @brief Extracts the n-th argument of a given function or member function.
  * @tparam Index The index of the argument to extract.
- * @tparam Candidate A valid function, member function or data member type.
+ * @tparam Candidate A valid function, member function or data member.
  */
-template<std::size_t Index, typename Candidate>
+template<std::size_t Index, auto Candidate>
 class nth_argument {
     template<typename Ret, typename... Args>
     static constexpr type_list<Args...> pick_up(Ret (*)(Args...));
@@ -893,15 +892,15 @@ class nth_argument {
 
 public:
     /*! @brief N-th argument of the given function or member function. */
-    using type = type_list_element_t<Index, decltype(pick_up(std::declval<Candidate>()))>;
+    using type = type_list_element_t<Index, decltype(pick_up(Candidate))>;
 };
 
 /**
  * @brief Helper type.
  * @tparam Index The index of the argument to extract.
- * @tparam Candidate A valid function, member function or data member type.
+ * @tparam Candidate A valid function, member function or data member.
  */
-template<std::size_t Index, typename Candidate>
+template<std::size_t Index, auto Candidate>
 using nth_argument_t = typename nth_argument<Index, Candidate>::type;
 
 } // namespace entt

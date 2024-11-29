@@ -1,57 +1,50 @@
-#include <memory>
 #include <tuple>
 #include <type_traits>
 #include <utility>
 #include <gtest/gtest.h>
 #include <entt/core/type_info.hpp>
-#include <entt/core/type_traits.hpp>
 #include <entt/entity/entity.hpp>
 #include <entt/entity/handle.hpp>
 #include <entt/entity/registry.hpp>
 
-template<typename Type>
-struct BasicHandle: testing::Test {
-    using type = Type;
-};
+TEST(BasicHandle, Assumptions) {
+    static_assert(std::is_trivially_copyable_v<entt::handle>);
+    static_assert(std::is_trivially_assignable_v<entt::handle, entt::handle>);
+    static_assert(std::is_trivially_destructible_v<entt::handle>);
 
-using BasicHandleTypes = ::testing::Types<entt::handle, entt::const_handle>;
-
-TYPED_TEST_SUITE(BasicHandle, BasicHandleTypes, );
-
-TYPED_TEST(BasicHandle, Assumptions) {
-    using handle_type = typename TestFixture::type;
-    static_assert(std::is_trivially_copyable_v<handle_type>, "Trivially copyable type required");
-    static_assert((std::is_trivially_assignable_v<handle_type, handle_type>), "Trivially assignable type required");
-    static_assert(std::is_trivially_destructible_v<handle_type>, "Trivially destructible type required");
+    static_assert(std::is_trivially_copyable_v<entt::const_handle>);
+    static_assert(std::is_trivially_assignable_v<entt::const_handle, entt::const_handle>);
+    static_assert(std::is_trivially_destructible_v<entt::const_handle>);
 }
 
-TYPED_TEST(BasicHandle, DeductionGuide) {
-    using handle_type = typename TestFixture::type;
-    testing::StaticAssertTypeEq<decltype(entt::basic_handle{std::declval<typename handle_type::registry_type &>(), {}}), handle_type>();
+TEST(BasicHandle, DeductionGuide) {
+    static_assert(std::is_same_v<decltype(entt::basic_handle{std::declval<entt::registry &>(), {}}), entt::basic_handle<entt::registry>>);
+    static_assert(std::is_same_v<decltype(entt::basic_handle{std::declval<const entt::registry &>(), {}}), entt::basic_handle<const entt::registry>>);
 }
 
-TYPED_TEST(BasicHandle, Construction) {
-    using handle_type = typename TestFixture::type;
-
+TEST(BasicHandle, Construction) {
     entt::registry registry;
     const auto entity = registry.create();
 
-    const handle_type handle{registry, entity};
+    entt::handle handle{registry, entity};
+    entt::const_handle chandle{std::as_const(registry), entity};
 
     ASSERT_FALSE(entt::null == handle.entity());
     ASSERT_EQ(entity, handle);
     ASSERT_TRUE(handle);
 
-    ASSERT_EQ(handle, (entt::handle{registry, entity}));
-    ASSERT_EQ(handle, (entt::const_handle{registry, entity}));
+    ASSERT_FALSE(entt::null == chandle.entity());
+    ASSERT_EQ(entity, chandle);
+    ASSERT_TRUE(chandle);
 
-    testing::StaticAssertTypeEq<typename handle_type::registry_type *, decltype(handle.registry())>();
+    ASSERT_EQ(handle, chandle);
+
+    static_assert(std::is_same_v<entt::registry *, decltype(handle.registry())>);
+    static_assert(std::is_same_v<const entt::registry *, decltype(chandle.registry())>);
 }
 
-TYPED_TEST(BasicHandle, Invalidation) {
-    using handle_type = typename TestFixture::type;
-
-    handle_type handle;
+TEST(BasicHandle, Invalidation) {
+    entt::handle handle;
 
     ASSERT_FALSE(handle);
     ASSERT_EQ(handle.registry(), nullptr);
@@ -109,62 +102,63 @@ TEST(BasicHandle, Destruction) {
     ASSERT_EQ(handle.entity(), entt::entity{entt::null});
 }
 
-TYPED_TEST(BasicHandle, Comparison) {
-    using handle_type = typename TestFixture::type;
-
-    handle_type handle{};
-
-    ASSERT_EQ(handle, entt::handle{});
-    ASSERT_TRUE(handle == entt::handle{});
-    ASSERT_FALSE(handle != entt::handle{});
-
-    ASSERT_EQ(handle, entt::const_handle{});
-    ASSERT_TRUE(handle == entt::const_handle{});
-    ASSERT_FALSE(handle != entt::const_handle{});
-
+TEST(BasicHandle, Comparison) {
     entt::registry registry;
     const auto entity = registry.create();
-    handle = handle_type{registry, entity};
+
+    entt::handle handle{registry, entity};
+    entt::const_handle chandle = handle;
 
     ASSERT_NE(handle, entt::handle{});
     ASSERT_FALSE(handle == entt::handle{});
     ASSERT_TRUE(handle != entt::handle{});
 
-    ASSERT_NE(handle, entt::const_handle{});
-    ASSERT_FALSE(handle == entt::const_handle{});
-    ASSERT_TRUE(handle != entt::const_handle{});
+    ASSERT_NE(chandle, entt::const_handle{});
+    ASSERT_FALSE(chandle == entt::const_handle{});
+    ASSERT_TRUE(chandle != entt::const_handle{});
+
+    ASSERT_EQ(handle, chandle);
+    ASSERT_TRUE(handle == chandle);
+    ASSERT_FALSE(handle != chandle);
+
+    ASSERT_EQ(entt::handle{}, entt::const_handle{});
+    ASSERT_TRUE(entt::handle{} == entt::const_handle{});
+    ASSERT_FALSE(entt::handle{} != entt::const_handle{});
 
     handle = {};
+    chandle = {};
 
     ASSERT_EQ(handle, entt::handle{});
     ASSERT_TRUE(handle == entt::handle{});
     ASSERT_FALSE(handle != entt::handle{});
 
-    ASSERT_EQ(handle, entt::const_handle{});
-    ASSERT_TRUE(handle == entt::const_handle{});
-    ASSERT_FALSE(handle != entt::const_handle{});
+    ASSERT_EQ(chandle, entt::const_handle{});
+    ASSERT_TRUE(chandle == entt::const_handle{});
+    ASSERT_FALSE(chandle != entt::const_handle{});
 
-    entt::registry diff;
+    entt::registry other;
+    const auto entt = other.create();
+
     handle = {registry, entity};
-    const handle_type other = {diff, diff.create()};
+    chandle = {other, entt};
 
-    ASSERT_NE(handle, other);
-    ASSERT_FALSE(other == handle);
-    ASSERT_TRUE(other != handle);
-    ASSERT_EQ(handle.entity(), other.entity());
-    ASSERT_NE(handle.registry(), other.registry());
+    ASSERT_NE(handle, chandle);
+    ASSERT_FALSE(chandle == handle);
+    ASSERT_TRUE(chandle != handle);
+    ASSERT_EQ(handle.entity(), chandle.entity());
+    ASSERT_NE(handle.registry(), chandle.registry());
 }
 
 TEST(BasicHandle, Component) {
     entt::registry registry;
     const auto entity = registry.create();
-    const entt::handle_view<int, char, double> handle{registry, entity};
+    entt::handle_view<int, char, double> handle{registry, entity};
 
     ASSERT_EQ(3, handle.emplace<int>(3));
     ASSERT_EQ('c', handle.emplace_or_replace<char>('c'));
     ASSERT_EQ(.3, handle.emplace_or_replace<double>(.3));
 
-    const auto &patched = handle.patch<int>([](auto &comp) { comp = 42; }); // NOLINT
+    const auto &patched = handle.patch<int>([](auto &comp) { comp = 42; });
 
     ASSERT_EQ(42, patched);
     ASSERT_EQ('a', handle.replace<char>('a'));
@@ -199,80 +193,83 @@ TEST(BasicHandle, Component) {
     ASSERT_EQ(nullptr, std::get<1>(handle.try_get<int, char, double>()));
 }
 
-TYPED_TEST(BasicHandle, FromEntity) {
-    using handle_type = typename TestFixture::type;
-
+TEST(BasicHandle, FromEntity) {
     entt::registry registry;
     const auto entity = registry.create();
 
-    registry.emplace<int>(entity, 42); // NOLINT
+    registry.emplace<int>(entity, 42);
     registry.emplace<char>(entity, 'c');
 
-    const handle_type handle{registry, entity};
+    entt::handle handle{registry, entity};
 
     ASSERT_TRUE(handle);
     ASSERT_EQ(entity, handle.entity());
-    ASSERT_TRUE((handle.template all_of<int, char>()));
-    ASSERT_EQ(handle.template get<int>(), 42);
-    ASSERT_EQ(handle.template get<char>(), 'c');
+    ASSERT_TRUE((handle.all_of<int, char>()));
+    ASSERT_EQ(handle.get<int>(), 42);
+    ASSERT_EQ(handle.get<char>(), 'c');
 }
 
 TEST(BasicHandle, Lifetime) {
     entt::registry registry;
     const auto entity = registry.create();
-    auto handle = std::make_unique<entt::handle>(registry, entity);
+    auto *handle = new entt::handle{registry, entity};
     handle->emplace<int>();
 
     ASSERT_FALSE(registry.storage<int>().empty());
-    ASSERT_NE(registry.storage<entt::entity>().free_list(), 0u);
+    ASSERT_FALSE(registry.empty());
 
-    for(auto [entt]: registry.storage<entt::entity>().each()) {
-        ASSERT_EQ(handle->entity(), entt);
-    }
+    registry.each([handle](const auto e) {
+        ASSERT_EQ(handle->entity(), e);
+    });
 
-    handle.reset();
+    delete handle;
 
     ASSERT_FALSE(registry.storage<int>().empty());
-    ASSERT_NE(registry.storage<entt::entity>().free_list(), 0u);
+    ASSERT_FALSE(registry.empty());
 }
 
 TEST(BasicHandle, ImplicitConversions) {
     entt::registry registry;
     const entt::handle handle{registry, registry.create()};
-    const entt::const_handle const_handle = handle;
-    const entt::handle_view<int, char> handle_view = handle;
-    const entt::const_handle_view<int> const_handle_view = handle_view;
+    const entt::const_handle chandle = handle;
+    const entt::handle_view<int, char> vhandle = handle;
+    const entt::const_handle_view<int> cvhandle = vhandle;
 
-    handle.emplace<int>(42); // NOLINT
+    handle.emplace<int>(42);
 
-    ASSERT_EQ(handle.get<int>(), const_handle.get<int>());
-    ASSERT_EQ(const_handle.get<int>(), handle_view.get<int>());
-    ASSERT_EQ(handle_view.get<int>(), const_handle_view.get<int>());
-    ASSERT_EQ(const_handle_view.get<int>(), 42);
+    ASSERT_EQ(handle.get<int>(), chandle.get<int>());
+    ASSERT_EQ(chandle.get<int>(), vhandle.get<int>());
+    ASSERT_EQ(vhandle.get<int>(), cvhandle.get<int>());
+    ASSERT_EQ(cvhandle.get<int>(), 42);
 }
 
-TYPED_TEST(BasicHandle, Storage) {
-    using handle_type = typename TestFixture::type;
-
+TEST(BasicHandle, Storage) {
     entt::registry registry;
     const auto entity = registry.create();
-    const handle_type handle{registry, entity};
 
-    testing::StaticAssertTypeEq<decltype(*handle.storage().begin()), std::pair<entt::id_type, entt::constness_as_t<entt::sparse_set, typename handle_type::registry_type> &>>();
+    entt::handle handle{registry, entity};
+    entt::const_handle chandle{std::as_const(registry), entity};
+
+    static_assert(std::is_same_v<decltype(*handle.storage().begin()), std::pair<entt::id_type, entt::sparse_set &>>);
+    static_assert(std::is_same_v<decltype(*chandle.storage().begin()), std::pair<entt::id_type, const entt::sparse_set &>>);
 
     ASSERT_EQ(handle.storage().begin(), handle.storage().end());
+    ASSERT_EQ(chandle.storage().begin(), chandle.storage().end());
 
     registry.storage<double>();
     registry.emplace<int>(entity);
 
     ASSERT_NE(handle.storage().begin(), handle.storage().end());
+    ASSERT_NE(chandle.storage().begin(), chandle.storage().end());
+
     ASSERT_EQ(++handle.storage().begin(), handle.storage().end());
+    ASSERT_EQ(++chandle.storage().begin(), chandle.storage().end());
+
     ASSERT_EQ(handle.storage().begin()->second.type(), entt::type_id<int>());
+    ASSERT_EQ(chandle.storage().begin()->second.type(), entt::type_id<int>());
 }
 
-TYPED_TEST(BasicHandle, HandleStorageIterator) {
-    using handle_type = typename TestFixture::type;
-
+TEST(BasicHandle, HandleStorageIterator) {
     entt::registry registry;
     const auto entity = registry.create();
 
@@ -281,21 +278,27 @@ TYPED_TEST(BasicHandle, HandleStorageIterator) {
     // required to test the find-first initialization step
     registry.storage<entt::entity>().erase(entity);
 
-    const handle_type handle{registry, entity};
-    auto iterable = handle.storage();
+    auto test = [](auto iterable) {
+        auto end{iterable.begin()};
+        decltype(end) begin{};
+        begin = iterable.end();
+        std::swap(begin, end);
+
+        ASSERT_EQ(begin, iterable.cbegin());
+        ASSERT_EQ(end, iterable.cend());
+        ASSERT_NE(begin, end);
+
+        ASSERT_EQ(begin++, iterable.begin());
+        ASSERT_EQ(++begin, iterable.end());
+    };
+
+    const auto handle = entt::handle{registry, entity};
+    const auto chandle = entt::const_handle{std::as_const(registry), entity};
 
     ASSERT_FALSE(registry.valid(entity));
     ASSERT_FALSE(handle);
+    ASSERT_FALSE(chandle);
 
-    auto end{iterable.begin()};
-    decltype(end) begin{};
-    begin = iterable.end();
-    std::swap(begin, end);
-
-    ASSERT_EQ(begin, iterable.cbegin());
-    ASSERT_EQ(end, iterable.cend());
-    ASSERT_NE(begin, end);
-
-    ASSERT_EQ(begin++, iterable.begin());
-    ASSERT_EQ(++begin, iterable.end());
+    test(handle.storage());
+    test(chandle.storage());
 }

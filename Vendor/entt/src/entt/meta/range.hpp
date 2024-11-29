@@ -10,7 +10,11 @@
 
 namespace entt {
 
-/*! @cond TURN_OFF_DOXYGEN */
+/**
+ * @cond TURN_OFF_DOXYGEN
+ * Internal details not to be documented.
+ */
+
 namespace internal {
 
 template<typename Type, typename It>
@@ -20,7 +24,6 @@ struct meta_range_iterator final {
     using pointer = input_iterator_pointer<value_type>;
     using reference = value_type;
     using iterator_category = std::input_iterator_tag;
-    using iterator_concept = std::random_access_iterator_tag;
 
     constexpr meta_range_iterator() noexcept
         : it{},
@@ -128,7 +131,11 @@ template<typename... Args>
 }
 
 } // namespace internal
-/*! @endcond */
+
+/**
+ * Internal details not to be documented.
+ * @endcond
+ */
 
 /**
  * @brief Iterable range to use to iterate all types of meta objects.

@@ -4,7 +4,6 @@
 #include <cstdint>
 #include <type_traits>
 #include <utility>
-#include "fwd.hpp"
 
 namespace entt {
 
@@ -176,13 +175,13 @@ public:
      * The function is idempotent and it does nothing if the process isn't
      * alive.
      *
-     * @param immediate Requests an immediate operation.
+     * @param immediately Requests an immediate operation.
      */
-    void abort(const bool immediate = false) {
+    void abort(const bool immediately = false) {
         if(alive()) {
             current = state::aborted;
 
-            if(immediate) {
+            if(immediately) {
                 tick({});
             }
         }

@@ -63,5 +63,4 @@ implicit list within the packed array itself.
 
 The interface is in all respects similar to its counterpart in the standard
 library, that is, the `std::unordered_set` class.<br/>
-However, this type of set also supports reverse iteration and therefore offers
-all the functions necessary for the purpose (such as `rbegin` and `rend`).
+Therefore, there is no need to go into the API description.

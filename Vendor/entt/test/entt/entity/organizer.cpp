@@ -1,4 +1,3 @@
-#include <array>
 #include <cstddef>
 #include <utility>
 #include <gtest/gtest.h>
@@ -75,8 +74,7 @@ TEST(Organizer, EmplaceFreeFunction) {
     ASSERT_EQ(graph[2u].children()[0u], 3u);
 
     for(auto &&vertex: graph) {
-        typename entt::organizer::function_type *cb = vertex.callback();
-        ASSERT_NO_THROW(cb(vertex.data(), registry));
+        ASSERT_NO_FATAL_FAILURE(vertex.callback()(vertex.data(), registry));
     }
 
     organizer.clear();
@@ -132,8 +130,7 @@ TEST(Organizer, EmplaceMemberFunction) {
     ASSERT_EQ(graph[2u].children()[0u], 3u);
 
     for(auto &&vertex: graph) {
-        typename entt::organizer::function_type *cb = vertex.callback();
-        ASSERT_NO_THROW(cb(vertex.data(), registry));
+        ASSERT_NO_FATAL_FAILURE(vertex.callback()(vertex.data(), registry));
     }
 
     organizer.clear();
@@ -197,8 +194,7 @@ TEST(Organizer, EmplaceFreeFunctionWithPayload) {
     ASSERT_EQ(graph[3u].children()[0u], 4u);
 
     for(auto &&vertex: graph) {
-        typename entt::organizer::function_type *cb = vertex.callback();
-        ASSERT_NO_THROW(cb(vertex.data(), registry));
+        ASSERT_NO_FATAL_FAILURE(vertex.callback()(vertex.data(), registry));
     }
 
     organizer.clear();
@@ -271,8 +267,7 @@ TEST(Organizer, EmplaceDirectFunction) {
     ASSERT_EQ(graph[2u].children()[0u], 3u);
 
     for(auto &&vertex: graph) {
-        typename entt::organizer::function_type *cb = vertex.callback();
-        ASSERT_NO_THROW(cb(vertex.data(), registry));
+        ASSERT_NO_FATAL_FAILURE(vertex.callback()(vertex.data(), registry));
     }
 
     organizer.clear();
@@ -325,8 +320,7 @@ TEST(Organizer, SyncPoint) {
     ASSERT_EQ(graph[4u].children()[0u], 5u);
 
     for(auto &&vertex: graph) {
-        typename entt::organizer::function_type *cb = vertex.callback();
-        ASSERT_NO_THROW(cb(vertex.data(), registry));
+        ASSERT_NO_FATAL_FAILURE(vertex.callback()(vertex.data(), registry));
     }
 }
 
@@ -397,40 +391,40 @@ TEST(Organizer, Dependencies) {
     organizer.emplace<char, const double>(+[](const void *, entt::registry &) {});
 
     const auto graph = organizer.graph();
-    std::array<const entt::type_info *, 5u> buffer{}; // NOLINT
+    const entt::type_info *buffer[5u]{};
 
     ASSERT_EQ(graph.size(), 3u);
 
     ASSERT_EQ(graph[0u].ro_count(), 2u);
     ASSERT_EQ(graph[0u].rw_count(), 0u);
 
-    ASSERT_EQ(graph[0u].ro_dependency(buffer.data(), 0u), 0u);
-    ASSERT_EQ(graph[0u].rw_dependency(buffer.data(), 2u), 0u);
+    ASSERT_EQ(graph[0u].ro_dependency(buffer, 0u), 0u);
+    ASSERT_EQ(graph[0u].rw_dependency(buffer, 2u), 0u);
 
-    ASSERT_EQ(graph[0u].ro_dependency(buffer.data(), 5u), 2u);
+    ASSERT_EQ(graph[0u].ro_dependency(buffer, 5u), 2u);
     ASSERT_EQ(*buffer[0u], entt::type_id<int>());
     ASSERT_EQ(*buffer[1u], entt::type_id<double>());
 
     ASSERT_EQ(graph[1u].ro_count(), 0u);
     ASSERT_EQ(graph[1u].rw_count(), 2u);
 
-    ASSERT_EQ(graph[1u].ro_dependency(buffer.data(), 2u), 0u);
-    ASSERT_EQ(graph[1u].rw_dependency(buffer.data(), 0u), 0u);
+    ASSERT_EQ(graph[1u].ro_dependency(buffer, 2u), 0u);
+    ASSERT_EQ(graph[1u].rw_dependency(buffer, 0u), 0u);
 
-    ASSERT_EQ(graph[1u].rw_dependency(buffer.data(), 5u), 2u);
+    ASSERT_EQ(graph[1u].rw_dependency(buffer, 5u), 2u);
     ASSERT_EQ(*buffer[0u], entt::type_id<int>());
     ASSERT_EQ(*buffer[1u], entt::type_id<char>());
 
     ASSERT_EQ(graph[2u].ro_count(), 1u);
     ASSERT_EQ(graph[2u].rw_count(), 1u);
 
-    ASSERT_EQ(graph[2u].ro_dependency(buffer.data(), 2u), 1u);
-    ASSERT_EQ(graph[2u].rw_dependency(buffer.data(), 0u), 0u);
+    ASSERT_EQ(graph[2u].ro_dependency(buffer, 2u), 1u);
+    ASSERT_EQ(graph[2u].rw_dependency(buffer, 0u), 0u);
 
-    ASSERT_EQ(graph[2u].ro_dependency(buffer.data(), 5u), 1u);
+    ASSERT_EQ(graph[2u].ro_dependency(buffer, 5u), 1u);
     ASSERT_EQ(*buffer[0u], entt::type_id<double>());
 
-    ASSERT_EQ(graph[2u].rw_dependency(buffer.data(), 5u), 1u);
+    ASSERT_EQ(graph[2u].rw_dependency(buffer, 5u), 1u);
     ASSERT_EQ(*buffer[0u], entt::type_id<char>());
 }
 
@@ -439,7 +433,7 @@ TEST(Organizer, ToArgsIntegrity) {
     entt::registry registry;
 
     organizer.emplace<&to_args_integrity>();
-    registry.ctx().emplace<std::size_t>(42u); // NOLINT
+    registry.ctx().emplace<std::size_t>(42u);
 
     auto graph = organizer.graph();
     graph[0u].callback()(graph[0u].data(), registry);

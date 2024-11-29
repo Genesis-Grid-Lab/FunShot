@@ -2,14 +2,13 @@
 #define ENTT_PROCESS_FWD_HPP
 
 #include <cstdint>
-#include <memory>
 
 namespace entt {
 
 template<typename, typename>
 class process;
 
-template<typename = std::uint32_t, typename = std::allocator<void>>
+template<typename = std::uint32_t>
 class basic_scheduler;
 
 /*! @brief Alias declaration for the most common use case. */

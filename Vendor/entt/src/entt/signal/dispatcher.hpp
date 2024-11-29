@@ -17,7 +17,11 @@
 
 namespace entt {
 
-/*! @cond TURN_OFF_DOXYGEN */
+/**
+ * @cond TURN_OFF_DOXYGEN
+ * Internal details not to be documented.
+ */
+
 namespace internal {
 
 struct basic_dispatcher_handler {
@@ -78,7 +82,7 @@ public:
         }
     }
 
-    [[nodiscard]] std::size_t size() const noexcept override {
+    std::size_t size() const noexcept override {
         return events.size();
     }
 
@@ -88,7 +92,11 @@ private:
 };
 
 } // namespace internal
-/*! @endcond */
+
+/**
+ * Internal details not to be documented.
+ * @endcond
+ */
 
 /**
  * @brief Basic dispatcher implementation.
@@ -182,6 +190,7 @@ public:
      */
     basic_dispatcher &operator=(basic_dispatcher &&other) noexcept {
         ENTT_ASSERT(alloc_traits::is_always_equal::value || pools.second() == other.pools.second(), "Copying a dispatcher is not allowed");
+
         pools = std::move(other.pools);
         return *this;
     }

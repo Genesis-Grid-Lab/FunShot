@@ -1,10 +1,15 @@
 #include <algorithm>
+#include <type_traits>
 #include <utility>
 #include <gtest/gtest.h>
 #include <entt/entity/entity.hpp>
 #include <entt/entity/registry.hpp>
 #include <entt/entity/runtime_view.hpp>
-#include "../common/pointer_stable.h"
+
+struct stable_type {
+    static constexpr auto in_place_delete = true;
+    int value;
+};
 
 template<typename Type>
 struct RuntimeView: testing::Test {
@@ -51,15 +56,15 @@ TYPED_TEST(RuntimeView, Functionalities) {
     ASSERT_EQ(*it, e1);
     ASSERT_EQ(++it, (view.end()));
 
-    ASSERT_NO_THROW((view.begin()++));
-    ASSERT_NO_THROW((++view.begin()));
+    ASSERT_NO_FATAL_FAILURE((view.begin()++));
+    ASSERT_NO_FATAL_FAILURE((++view.begin()));
 
     ASSERT_NE(view.begin(), view.end());
     ASSERT_EQ(view.size_hint(), 1u);
 
     registry.get<char>(e0) = '1';
     registry.get<char>(e1) = '2';
-    registry.get<int>(e1) = 42; // NOLINT
+    registry.get<int>(e1) = 42;
 
     for(auto entity: view) {
         ASSERT_EQ(registry.get<int>(entity), 42);
@@ -87,10 +92,10 @@ TYPED_TEST(RuntimeView, Constructors) {
     ASSERT_TRUE(view.contains(entity));
 
     runtime_view_type temp{view, view.get_allocator()};
-    const runtime_view_type other{std::move(temp), view.get_allocator()};
+    runtime_view_type other{std::move(temp), view.get_allocator()};
 
     ASSERT_TRUE(view.contains(entity));
-    ASSERT_FALSE(temp.contains(entity)); // NOLINT
+    ASSERT_FALSE(temp.contains(entity));
     ASSERT_TRUE(other.contains(entity));
 }
 
@@ -140,7 +145,7 @@ TYPED_TEST(RuntimeView, Move) {
 
     runtime_view_type other{std::move(view)};
 
-    ASSERT_FALSE(view.contains(entity)); // NOLINT
+    ASSERT_FALSE(view.contains(entity));
     ASSERT_TRUE(other.contains(entity));
 
     view = other;
@@ -151,7 +156,7 @@ TYPED_TEST(RuntimeView, Move) {
 
     other = std::move(view);
 
-    ASSERT_FALSE(view.contains(entity)); // NOLINT
+    ASSERT_FALSE(view.contains(entity));
     ASSERT_TRUE(other.contains(entity));
 }
 
@@ -337,12 +342,12 @@ TYPED_TEST(RuntimeView, StableType) {
     registry.emplace<int>(e1);
     registry.emplace<int>(e2);
 
-    registry.emplace<test::pointer_stable>(e0);
-    registry.emplace<test::pointer_stable>(e1);
+    registry.emplace<stable_type>(e0);
+    registry.emplace<stable_type>(e1);
 
-    registry.remove<test::pointer_stable>(e1);
+    registry.remove<stable_type>(e1);
 
-    view.iterate(registry.storage<int>()).iterate(registry.storage<test::pointer_stable>());
+    view.iterate(registry.storage<int>()).iterate(registry.storage<stable_type>());
 
     ASSERT_EQ(view.size_hint(), 2u);
     ASSERT_TRUE(view.contains(e0));
@@ -356,7 +361,7 @@ TYPED_TEST(RuntimeView, StableType) {
     });
 
     for(auto entt: view) {
-        testing::StaticAssertTypeEq<decltype(entt), entt::entity>();
+        static_assert(std::is_same_v<decltype(entt), entt::entity>);
         ASSERT_EQ(e0, entt);
     }
 
@@ -374,11 +379,11 @@ TYPED_TEST(RuntimeView, StableTypeWithExcludedComponent) {
     const auto entity = registry.create();
     const auto other = registry.create();
 
-    registry.emplace<test::pointer_stable>(entity, 0);
-    registry.emplace<test::pointer_stable>(other, 42); // NOLINT
+    registry.emplace<stable_type>(entity, 0);
+    registry.emplace<stable_type>(other, 42);
     registry.emplace<int>(entity);
 
-    view.iterate(registry.storage<test::pointer_stable>()).exclude(registry.storage<int>());
+    view.iterate(registry.storage<stable_type>()).exclude(registry.storage<int>());
 
     ASSERT_EQ(view.size_hint(), 2u);
     ASSERT_FALSE(view.contains(entity));

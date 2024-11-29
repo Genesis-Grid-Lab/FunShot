@@ -134,8 +134,8 @@ public:
      */
     explicit basic_flow(const allocator_type &allocator)
         : index{0u, allocator},
-          vertices{allocator},
-          deps{allocator},
+          vertices{},
+          deps{},
           sync_on{} {}
 
     /*! @brief Default copy constructor. */

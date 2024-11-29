@@ -22,23 +22,18 @@ namespace entt {
  *
  * This applies to all signals made available.
  *
- * @tparam Type Underlying storage type.
- * @tparam Registry Basic registry type.
+ * @tparam Type The type of the underlying storage.
  */
-template<typename Type, typename Registry>
-class basic_sigh_mixin final: public Type {
+template<typename Type>
+class sigh_mixin final: public Type {
     using underlying_type = Type;
-    using owner_type = Registry;
-
     using basic_registry_type = basic_registry<typename underlying_type::entity_type, typename underlying_type::base_type::allocator_type>;
-    using sigh_type = sigh<void(owner_type &, const typename underlying_type::entity_type), typename underlying_type::allocator_type>;
+    using sigh_type = sigh<void(basic_registry_type &, const typename underlying_type::entity_type), typename underlying_type::allocator_type>;
     using underlying_iterator = typename underlying_type::base_type::basic_iterator;
 
-    static_assert(std::is_base_of_v<basic_registry_type, owner_type>, "Invalid registry type");
-
-    owner_type &owner_or_assert() const noexcept {
+    basic_registry_type &owner_or_assert() const noexcept {
         ENTT_ASSERT(owner != nullptr, "Invalid pointer to registry");
-        return static_cast<owner_type &>(*owner);
+        return *owner;
     }
 
     void pop(underlying_iterator first, underlying_iterator last) final {
@@ -56,17 +51,13 @@ class basic_sigh_mixin final: public Type {
 
     void pop_all() final {
         if(auto &reg = owner_or_assert(); !destruction.empty()) {
-            for(auto it = underlying_type::base_type::begin(0), last = underlying_type::base_type::end(0); it != last; ++it) {
-                if constexpr(std::is_same_v<typename underlying_type::value_type, typename underlying_type::entity_type>) {
-                    destruction.publish(reg, *it);
-                } else {
-                    if constexpr(underlying_type::traits_type::in_place_delete) {
-                        if(const auto entt = *it; entt != tombstone) {
-                            destruction.publish(reg, entt);
-                        }
-                    } else {
-                        destruction.publish(reg, *it);
+            for(auto pos = underlying_type::each().begin().base().index(); !(pos < 0); --pos) {
+                if constexpr(underlying_type::traits_type::in_place_delete) {
+                    if(const auto entt = underlying_type::operator[](static_cast<typename underlying_type::size_type>(pos)); entt != tombstone) {
+                        destruction.publish(reg, entt);
                     }
+                } else {
+                    destruction.publish(reg, underlying_type::operator[](static_cast<typename underlying_type::size_type>(pos)));
                 }
             }
         }
@@ -90,17 +81,17 @@ public:
     /*! @brief Underlying entity identifier. */
     using entity_type = typename underlying_type::entity_type;
     /*! @brief Expected registry type. */
-    using registry_type = owner_type;
+    using registry_type = basic_registry_type;
 
     /*! @brief Default constructor. */
-    basic_sigh_mixin()
-        : basic_sigh_mixin{allocator_type{}} {}
+    sigh_mixin()
+        : sigh_mixin{allocator_type{}} {}
 
     /**
      * @brief Constructs an empty storage with a given allocator.
      * @param allocator The allocator to use.
      */
-    explicit basic_sigh_mixin(const allocator_type &allocator)
+    explicit sigh_mixin(const allocator_type &allocator)
         : underlying_type{allocator},
           owner{},
           construction{allocator},
@@ -111,7 +102,7 @@ public:
      * @brief Move constructor.
      * @param other The instance to move from.
      */
-    basic_sigh_mixin(basic_sigh_mixin &&other) noexcept
+    sigh_mixin(sigh_mixin &&other) noexcept
         : underlying_type{std::move(other)},
           owner{other.owner},
           construction{std::move(other.construction)},
@@ -123,7 +114,7 @@ public:
      * @param other The instance to move from.
      * @param allocator The allocator to use.
      */
-    basic_sigh_mixin(basic_sigh_mixin &&other, const allocator_type &allocator) noexcept
+    sigh_mixin(sigh_mixin &&other, const allocator_type &allocator) noexcept
         : underlying_type{std::move(other), allocator},
           owner{other.owner},
           construction{std::move(other.construction), allocator},
@@ -135,7 +126,7 @@ public:
      * @param other The instance to move from.
      * @return This storage.
      */
-    basic_sigh_mixin &operator=(basic_sigh_mixin &&other) noexcept {
+    sigh_mixin &operator=(sigh_mixin &&other) noexcept {
         underlying_type::operator=(std::move(other));
         owner = other.owner;
         construction = std::move(other.construction);
@@ -148,7 +139,7 @@ public:
      * @brief Exchanges the contents with those of a given storage.
      * @param other Storage to exchange the content with.
      */
-    void swap(basic_sigh_mixin &other) {
+    void swap(sigh_mixin &other) {
         using std::swap;
         underlying_type::swap(other);
         swap(owner, other.owner);
@@ -271,12 +262,11 @@ public:
      */
     template<typename It, typename... Args>
     void insert(It first, It last, Args &&...args) {
-        auto from = underlying_type::size();
         underlying_type::insert(first, last, std::forward<Args>(args)...);
 
         if(auto &reg = owner_or_assert(); !construction.empty()) {
-            for(const auto to = underlying_type::size(); from != to; ++from) {
-                construction.publish(reg, underlying_type::operator[](from));
+            for(; first != last; ++first) {
+                construction.publish(reg, *first);
             }
         }
     }

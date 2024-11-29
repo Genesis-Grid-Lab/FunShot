@@ -55,7 +55,7 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v3
     - name: Install compiler
       run: |
         sudo apt update
@@ -71,7 +71,7 @@ jobs:
       working-directory: build
       env:
         CTEST_OUTPUT_ON_FAILURE: 1
-      run: ctest -C Debug -j4
+      run: ctest --timeout 30 -C Debug -j4
 
   windows:
     timeout-minutes: 15
@@ -90,7 +90,7 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v3
     - name: Compile tests
       working-directory: build
       run: |
@@ -100,14 +100,14 @@ jobs:
       working-directory: build
       env:
         CTEST_OUTPUT_ON_FAILURE: 1
-      run: ctest -C Debug -j4
+      run: ctest --timeout 30 -C Debug -j4
 
   macos:
     timeout-minutes: 15
     runs-on: macOS-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v3
     - name: Compile tests
       working-directory: build
       run: |
@@ -117,7 +117,7 @@ jobs:
       working-directory: build
       env:
         CTEST_OUTPUT_ON_FAILURE: 1
-      run: ctest -C Debug -j4
+      run: ctest --timeout 30 -C Debug -j4
 
   extra:
     timeout-minutes: 15
@@ -131,7 +131,7 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v3
     - name: Compile tests
       working-directory: build
       run: |
@@ -141,4 +141,4 @@ jobs:
       working-directory: build
       env:
         CTEST_OUTPUT_ON_FAILURE: 1
-      run: ctest -C Debug -j4
+      run: ctest --timeout 30 -C Debug -j4

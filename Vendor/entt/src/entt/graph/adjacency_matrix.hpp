@@ -13,7 +13,11 @@
 
 namespace entt {
 
-/*! @cond TURN_OFF_DOXYGEN */
+/**
+ * @cond TURN_OFF_DOXYGEN
+ * Internal details not to be documented.
+ */
+
 namespace internal {
 
 template<typename It>
@@ -26,7 +30,6 @@ public:
     using reference = value_type;
     using difference_type = std::ptrdiff_t;
     using iterator_category = std::input_iterator_tag;
-    using iterator_concept = std::forward_iterator_tag;
 
     constexpr edge_iterator() noexcept
         : it{},
@@ -84,7 +87,11 @@ template<typename Container>
 }
 
 } // namespace internal
-/*! @endcond */
+
+/**
+ * Internal details not to be documented.
+ * @endcond
+ */
 
 /**
  * @brief Basic implementation of a directed adjacency matrix.

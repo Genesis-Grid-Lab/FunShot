@@ -6,13 +6,11 @@
 #include <entt/entity/registry.hpp>
 #include <entt/meta/factory.hpp>
 #include <entt/meta/meta.hpp>
-#include <entt/meta/policy.hpp>
-#include <entt/meta/range.hpp>
 #include <entt/meta/resolve.hpp>
 #include "../common/config.h"
 
 struct base_t {
-    base_t() = default;
+    base_t() {}
     virtual ~base_t() = default;
 
     static void destroy(base_t &) {
@@ -23,7 +21,7 @@ struct base_t {
         value = v;
     }
 
-    [[nodiscard]] int getter() const {
+    int getter() const {
         return value;
     }
 
@@ -31,7 +29,7 @@ struct base_t {
         ref.value = v;
     }
 
-    inline static int counter = 0; // NOLINT
+    inline static int counter = 0;
     int value{3};
 };
 
@@ -39,7 +37,7 @@ void fake_member(base_t &instance, int value) {
     instance.value = value;
 }
 
-[[nodiscard]] int fake_const_member(const base_t &instance) {
+int fake_const_member(const base_t &instance) {
     return instance.value;
 }
 
@@ -49,16 +47,16 @@ struct derived_t: base_t {
 };
 
 struct func_t {
-    [[nodiscard]] int f(const base_t &, int a, int b) {
+    int f(const base_t &, int a, int b) {
         return f(a, b);
     }
 
-    [[nodiscard]] int f(int a, int b) { // NOLINT
+    int f(int a, int b) {
         value = a;
         return b * b;
     }
 
-    [[nodiscard]] int f(int v) const {
+    int f(int v) const {
         return v * v;
     }
 
@@ -66,7 +64,7 @@ struct func_t {
         value = v * v;
     }
 
-    [[nodiscard]] static int h(int &v) {
+    static int h(int &v) {
         return (v *= value);
     }
 
@@ -74,19 +72,19 @@ struct func_t {
         value = v;
     }
 
-    [[nodiscard]] int v(int v) const {
+    int v(int v) const {
         return (value = v);
     }
 
-    [[nodiscard]] int &a() const {
+    int &a() const {
         return value;
     }
 
-    [[nodiscard]] operator int() const {
+    operator int() const {
         return value;
     }
 
-    inline static int value = 0; // NOLINT
+    inline static int value = 0;
 };
 
 double double_member(const double &value) {
@@ -259,7 +257,7 @@ TEST_F(MetaFunc, RetVoid) {
     ASSERT_EQ(func.arg(0u), entt::resolve<int>());
     ASSERT_FALSE(func.arg(1u));
 
-    auto any = func.invoke(instance, 5); // NOLINT
+    auto any = func.invoke(instance, 5);
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.type(), entt::resolve<void>());
@@ -328,7 +326,7 @@ TEST_F(MetaFunc, StaticRetVoid) {
     ASSERT_EQ(func.arg(0u), entt::resolve<int>());
     ASSERT_FALSE(func.arg(1u));
 
-    auto any = func.invoke({}, 42); // NOLINT
+    auto any = func.invoke({}, 42);
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.type(), entt::resolve<void>());
@@ -353,7 +351,7 @@ TEST_F(MetaFunc, StaticAsMember) {
 
     base_t instance{};
     auto func = entt::resolve<base_t>().func("fake_member"_hs);
-    auto any = func.invoke(instance, 42); // NOLINT
+    auto any = func.invoke(instance, 42);
 
     ASSERT_TRUE(func);
     ASSERT_EQ(func.arity(), 1u);
@@ -555,7 +553,7 @@ TEST_F(MetaFunc, InvokeBaseFunction) {
     ASSERT_TRUE(type.func("setter"_hs));
     ASSERT_EQ(instance.value, 3);
 
-    type.func("setter"_hs).invoke(instance, 42); // NOLINT
+    type.func("setter"_hs).invoke(instance, 42);
 
     ASSERT_EQ(instance.value, 42);
 }
@@ -571,7 +569,7 @@ TEST_F(MetaFunc, InvokeFromBase) {
     ASSERT_TRUE(setter_from_base);
     ASSERT_EQ(instance.value, 3);
 
-    setter_from_base.invoke(instance, 42); // NOLINT
+    setter_from_base.invoke(instance, 42);
 
     ASSERT_EQ(instance.value, 42);
 

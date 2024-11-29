@@ -4,14 +4,15 @@
 #include <entt/core/utility.hpp>
 #include <entt/entity/registry.hpp>
 #include <entt/locator/locator.hpp>
-#include <entt/meta/context.hpp>
 #include <entt/meta/factory.hpp>
 #include <entt/meta/meta.hpp>
-#include <entt/meta/policy.hpp>
 #include <entt/meta/resolve.hpp>
 
 struct base_t {
-    char value{'c'};
+    base_t()
+        : value{'c'} {}
+
+    char value;
 };
 
 struct derived_t: base_t {
@@ -74,7 +75,7 @@ struct MetaCtor: ::testing::Test {
 };
 
 TEST_F(MetaCtor, Functionalities) {
-    auto any = entt::resolve<clazz_t>().construct(42, 'c'); // NOLINT
+    auto any = entt::resolve<clazz_t>().construct(42, 'c');
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.cast<clazz_t>().i, 42);
@@ -82,7 +83,7 @@ TEST_F(MetaCtor, Functionalities) {
 }
 
 TEST_F(MetaCtor, Func) {
-    auto any = entt::resolve<clazz_t>().construct(42); // NOLINT
+    auto any = entt::resolve<clazz_t>().construct(42);
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.cast<clazz_t>().i, 42);
@@ -90,7 +91,7 @@ TEST_F(MetaCtor, Func) {
 }
 
 TEST_F(MetaCtor, MetaAnyArgs) {
-    auto any = entt::resolve<clazz_t>().construct(entt::meta_any{42}, entt::meta_any{'c'}); // NOLINT
+    auto any = entt::resolve<clazz_t>().construct(entt::meta_any{42}, entt::meta_any{'c'});
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.cast<clazz_t>().i, 42);
@@ -102,7 +103,7 @@ TEST_F(MetaCtor, InvalidArgs) {
 }
 
 TEST_F(MetaCtor, CastAndConvert) {
-    auto any = entt::resolve<clazz_t>().construct(derived_t{}, clazz_t{42, 'd'}); // NOLINT
+    auto any = entt::resolve<clazz_t>().construct(derived_t{}, clazz_t{42, 'd'});
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.cast<clazz_t>().i, 42);
@@ -118,7 +119,7 @@ TEST_F(MetaCtor, ArithmeticConversion) {
 }
 
 TEST_F(MetaCtor, ConstNonConstRefArgs) {
-    int ivalue = 42; // NOLINT
+    int ivalue = 42;
     const char cvalue = 'c';
     auto any = entt::resolve<clazz_t>().construct(entt::forward_as_meta(ivalue), entt::forward_as_meta(cvalue));
 
@@ -128,7 +129,7 @@ TEST_F(MetaCtor, ConstNonConstRefArgs) {
 }
 
 TEST_F(MetaCtor, WrongConstness) {
-    int value = 42; // NOLINT
+    int value = 42;
     auto any = entt::resolve<clazz_t>().construct(derived_t{}, entt::forward_as_meta(value));
     auto other = entt::resolve<clazz_t>().construct(derived_t{}, entt::forward_as_meta(std::as_const(value)));
 
@@ -139,7 +140,7 @@ TEST_F(MetaCtor, WrongConstness) {
 }
 
 TEST_F(MetaCtor, FuncMetaAnyArgs) {
-    auto any = entt::resolve<clazz_t>().construct(entt::meta_any{42}); // NOLINT
+    auto any = entt::resolve<clazz_t>().construct(entt::meta_any{42});
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.cast<clazz_t>().i, 42);
@@ -163,7 +164,7 @@ TEST_F(MetaCtor, FuncArithmeticConversion) {
 }
 
 TEST_F(MetaCtor, FuncConstNonConstRefArgs) {
-    int ivalue = 42; // NOLINT
+    int ivalue = 42;
     auto any = entt::resolve<clazz_t>().construct(entt::forward_as_meta(ivalue));
     auto other = entt::resolve<clazz_t>().construct(entt::forward_as_meta(std::as_const(ivalue)));
 

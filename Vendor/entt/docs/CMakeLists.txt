@@ -1,6 +1,6 @@
+#
 # Doxygen configuration (documentation)
-
-include(FetchContent)
+#
 
 FetchContent_Declare(
     doxygen-awesome-css

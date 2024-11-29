@@ -29,18 +29,18 @@ struct receiver {
 };
 
 TEST(Dispatcher, Functionalities) {
-    entt::dispatcher dispatcher{};
-    entt::dispatcher other{std::move(dispatcher)};
+    entt::dispatcher dispatcher;
+    entt::dispatcher other;
+    receiver receiver;
 
-    dispatcher = std::move(other);
-
-    receiver receiver{};
+    ASSERT_NO_FATAL_FAILURE(entt::dispatcher{std::move(dispatcher)});
+    ASSERT_NO_FATAL_FAILURE(dispatcher = std::move(other));
 
     ASSERT_EQ(dispatcher.size<an_event>(), 0u);
     ASSERT_EQ(dispatcher.size(), 0u);
 
-    dispatcher.trigger(one_more_event{1});
-    dispatcher.enqueue<one_more_event>(2);
+    dispatcher.trigger(one_more_event{42});
+    dispatcher.enqueue<one_more_event>(42);
     dispatcher.update<one_more_event>();
 
     dispatcher.sink<an_event>().connect<&receiver::receive>(receiver);
@@ -93,9 +93,9 @@ TEST(Dispatcher, Functionalities) {
 }
 
 TEST(Dispatcher, Swap) {
-    entt::dispatcher dispatcher{};
-    entt::dispatcher other{};
-    receiver receiver{};
+    entt::dispatcher dispatcher;
+    entt::dispatcher other;
+    receiver receiver;
 
     dispatcher.sink<an_event>().connect<&receiver::receive>(receiver);
     dispatcher.enqueue<an_event>();
@@ -119,8 +119,8 @@ TEST(Dispatcher, Swap) {
 }
 
 TEST(Dispatcher, StopAndGo) {
-    entt::dispatcher dispatcher{};
-    receiver receiver{};
+    entt::dispatcher dispatcher;
+    receiver receiver;
 
     dispatcher.sink<an_event>().connect<&receiver::forward>(dispatcher);
     dispatcher.sink<an_event>().connect<&receiver::receive>(receiver);
@@ -137,8 +137,8 @@ TEST(Dispatcher, StopAndGo) {
 }
 
 TEST(Dispatcher, OpaqueDisconnect) {
-    entt::dispatcher dispatcher{};
-    receiver receiver{};
+    entt::dispatcher dispatcher;
+    receiver receiver;
 
     dispatcher.sink<an_event>().connect<&receiver::receive>(receiver);
     dispatcher.trigger<an_event>();
@@ -154,8 +154,8 @@ TEST(Dispatcher, OpaqueDisconnect) {
 TEST(Dispatcher, NamedQueue) {
     using namespace entt::literals;
 
-    entt::dispatcher dispatcher{};
-    receiver receiver{};
+    entt::dispatcher dispatcher;
+    receiver receiver;
 
     dispatcher.sink<an_event>("named"_hs).connect<&receiver::receive>(receiver);
     dispatcher.trigger<an_event>();
@@ -187,14 +187,14 @@ TEST(Dispatcher, NamedQueue) {
 }
 
 TEST(Dispatcher, CustomAllocator) {
-    const std::allocator<void> allocator{};
+    std::allocator<void> allocator;
     entt::dispatcher dispatcher{allocator};
 
     ASSERT_EQ(dispatcher.get_allocator(), allocator);
     ASSERT_FALSE(dispatcher.get_allocator() != allocator);
 
     dispatcher.enqueue<an_event>();
-    const decltype(dispatcher) other{std::move(dispatcher), allocator};
+    decltype(dispatcher) other{std::move(dispatcher), allocator};
 
     ASSERT_EQ(other.size<an_event>(), 1u);
 }

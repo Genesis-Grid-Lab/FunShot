@@ -16,9 +16,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    # temporary workaround for https://github.com/actions/runner-images/issues/8659
-    - uses: mjp41/workaround8649@c8550b715ccdc17f89c8d5c28d7a48eeff9c94a8
+    - uses: actions/checkout@v3
     - name: Compile tests
       working-directory: build
       env:
@@ -30,4 +28,4 @@ jobs:
       working-directory: build
       env:
         CTEST_OUTPUT_ON_FAILURE: 1
-      run: ctest -C Debug -j4
+      run: ctest --timeout 30 -C Debug -j4

@@ -1,10 +1,8 @@
 #include <sstream>
-#include <type_traits>
 #include <vector>
 #include <gtest/gtest.h>
 #include <cereal/archives/json.hpp>
 #include <entt/core/hashed_string.hpp>
-#include <entt/core/type_traits.hpp>
 #include <entt/entity/registry.hpp>
 #include <entt/entity/snapshot.hpp>
 
@@ -66,23 +64,21 @@ TEST(Snapshot, Full) {
     {
         // output finishes flushing its contents when it goes out of scope
         cereal::JSONOutputArchive output{storage};
-
         entt::snapshot{source}
-            .get<entt::entity>(output)
-            .get<position>(output)
-            .get<timer>(output)
-            .get<relationship>(output)
-            .get<entt::tag<"empty"_hs>>(output);
+            .entities(output)
+            .component<position>(output)
+            .component<timer>(output)
+            .component<relationship>(output)
+            .component<entt::tag<"empty"_hs>>(output);
     }
 
     cereal::JSONInputArchive input{storage};
-
     entt::snapshot_loader{destination}
-        .get<entt::entity>(input)
-        .get<position>(input)
-        .get<timer>(input)
-        .get<relationship>(input)
-        .get<entt::tag<"empty"_hs>>(input);
+        .entities(input)
+        .component<position>(input)
+        .component<timer>(input)
+        .component<relationship>(input)
+        .component<entt::tag<"empty"_hs>>(input);
 
     ASSERT_TRUE(destination.valid(e0));
     ASSERT_TRUE(destination.all_of<position>(e0));
@@ -114,13 +110,13 @@ TEST(Snapshot, Continuous) {
     entt::registry source;
     entt::registry destination;
 
-    std::vector<entt::entity> entity;
+    std::vector<entt::entity> entities;
     for(auto i = 0; i < 10; ++i) {
-        entity.push_back(source.create());
+        entities.push_back(source.create());
     }
 
-    for(auto entt: entity) {
-        source.destroy(entt);
+    for(auto entity: entities) {
+        source.destroy(entity);
     }
 
     auto e0 = source.create();
@@ -143,32 +139,22 @@ TEST(Snapshot, Continuous) {
     {
         // output finishes flushing its contents when it goes out of scope
         cereal::JSONOutputArchive output{storage};
-
         entt::snapshot{source}
-            .get<entt::entity>(output)
-            .get<position>(output)
-            .get<relationship>(output)
-            .get<timer>(output)
-            .get<entt::tag<"empty"_hs>>(output);
+            .component<entt::entity>(output)
+            .component<position>(output)
+            .component<relationship>(output)
+            .component<timer>(output)
+            .component<entt::tag<"empty"_hs>>(output);
     }
 
     cereal::JSONInputArchive input{storage};
     entt::continuous_loader loader{destination};
-
-    auto archive = [&input, &loader](auto &value) {
-        input(value);
-
-        if constexpr(std::is_same_v<std::remove_reference_t<decltype(value)>, relationship>) {
-            value.parent = loader.map(value.parent);
-        }
-    };
-
     loader
-        .get<entt::entity>(input)
-        .get<position>(input)
-        .get<relationship>(archive)
-        .get<timer>(input)
-        .get<entt::tag<"empty"_hs>>(input);
+        .entities(input)
+        .component<position>(input)
+        .component<relationship>(input, &relationship::parent)
+        .component<timer>(input)
+        .component<entt::tag<"empty"_hs>>(input);
 
     ASSERT_FALSE(destination.valid(e0));
     ASSERT_TRUE(loader.contains(e0));

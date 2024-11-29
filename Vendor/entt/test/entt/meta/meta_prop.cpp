@@ -1,9 +1,9 @@
 #include <cstring>
+#include <tuple>
 #include <utility>
 #include <gtest/gtest.h>
 #include <entt/core/hashed_string.hpp>
 #include <entt/locator/locator.hpp>
-#include <entt/meta/context.hpp>
 #include <entt/meta/factory.hpp>
 #include <entt/meta/meta.hpp>
 #include <entt/meta/resolve.hpp>
@@ -19,7 +19,7 @@ struct MetaProp: ::testing::Test {
 
         entt::meta<base_1_t>()
             .type("base_1"_hs)
-            .prop("int"_hs, 42); // NOLINT
+            .prop("int"_hs, 42);
 
         entt::meta<base_2_t>()
             .type("base_2"_hs)
@@ -29,7 +29,7 @@ struct MetaProp: ::testing::Test {
         entt::meta<base_3_t>()
             .type("base_3"_hs)
             .prop("key_only"_hs)
-            .prop("key"_hs, 42); // NOLINT
+            .prop("key"_hs, 42);
 
         entt::meta<derived_t>()
             .type("derived"_hs)

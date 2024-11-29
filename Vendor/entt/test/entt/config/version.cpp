@@ -1,6 +1,5 @@
 #include <regex>
 #include <gtest/gtest.h>
-#include <entt/config/macro.h>
 #include <entt/config/version.h>
 
 TEST(Version, All) {

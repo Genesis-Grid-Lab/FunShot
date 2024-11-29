@@ -52,6 +52,7 @@ class sigh;
  */
 template<typename Ret, typename... Args, typename Allocator>
 class sigh<Ret(Args...), Allocator> {
+    /*! @brief A sink is allowed to modify a signal. */
     friend class sink<sigh<Ret(Args...), Allocator>>;
 
     using alloc_traits = std::allocator_traits<Allocator>;
@@ -224,6 +225,7 @@ private:
  * the sink that generated it.
  */
 class connection {
+    /*! @brief A sink is allowed to create connection objects. */
     template<typename>
     friend class sink;
 

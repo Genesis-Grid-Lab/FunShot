@@ -13,7 +13,11 @@
 
 namespace entt {
 
-/*! @cond TURN_OFF_DOXYGEN */
+/**
+ * @cond TURN_OFF_DOXYGEN
+ * Internal details not to be documented.
+ */
+
 namespace internal {
 
 enum class any_operation : std::uint8_t {
@@ -26,18 +30,18 @@ enum class any_operation : std::uint8_t {
     get
 };
 
-} // namespace internal
-/*! @endcond */
-
-/*! @brief Possible modes of an any object. */
 enum class any_policy : std::uint8_t {
-    /*! @brief Default mode, the object owns the contained element. */
     owner,
-    /*! @brief Aliasing mode, the object _points_ to a non-const element. */
     ref,
-    /*! @brief Const aliasing mode, the object _points_ to a const element. */
     cref
 };
+
+} // namespace internal
+
+/**
+ * Internal details not to be documented.
+ * @endcond
+ */
 
 /**
  * @brief A SBO friendly, type-safe container for single values of any type.
@@ -47,6 +51,7 @@ enum class any_policy : std::uint8_t {
 template<std::size_t Len, std::size_t Align>
 class basic_any {
     using operation = internal::any_operation;
+    using policy = internal::any_policy;
     using vtable_type = const void *(const operation, const basic_any &, const void *);
 
     struct storage_type {
@@ -58,11 +63,11 @@ class basic_any {
 
     template<typename Type>
     static const void *basic_vtable(const operation op, const basic_any &value, const void *other) {
-        static_assert(!std::is_void_v<Type> && std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, Type>, "Invalid type");
+        static_assert(!std::is_same_v<Type, void> && std::is_same_v<std::remove_cv_t<std::remove_reference_t<Type>>, Type>, "Invalid type");
         const Type *element = nullptr;
 
         if constexpr(in_situ<Type>) {
-            element = (value.mode == any_policy::owner) ? reinterpret_cast<const Type *>(&value.storage) : static_cast<const Type *>(value.instance);
+            element = value.owner() ? reinterpret_cast<const Type *>(&value.storage) : static_cast<const Type *>(value.instance);
         } else {
             element = static_cast<const Type *>(value.instance);
         }
@@ -75,7 +80,7 @@ class basic_any {
             break;
         case operation::move:
             if constexpr(in_situ<Type>) {
-                if(value.mode == any_policy::owner) {
+                if(value.owner()) {
                     return new(&static_cast<basic_any *>(const_cast<void *>(other))->storage) Type{std::move(*const_cast<Type *>(element))};
                 }
             }
@@ -124,7 +129,7 @@ class basic_any {
 
             if constexpr(std::is_lvalue_reference_v<Type>) {
                 static_assert((std::is_lvalue_reference_v<Args> && ...) && (sizeof...(Args) == 1u), "Invalid arguments");
-                mode = std::is_const_v<std::remove_reference_t<Type>> ? any_policy::cref : any_policy::ref;
+                mode = std::is_const_v<std::remove_reference_t<Type>> ? policy::cref : policy::ref;
                 instance = (std::addressof(args), ...);
             } else if constexpr(in_situ<std::remove_cv_t<std::remove_reference_t<Type>>>) {
                 if constexpr(std::is_aggregate_v<std::remove_cv_t<std::remove_reference_t<Type>>> && (sizeof...(Args) != 0u || !std::is_default_constructible_v<std::remove_cv_t<std::remove_reference_t<Type>>>)) {
@@ -142,7 +147,7 @@ class basic_any {
         }
     }
 
-    basic_any(const basic_any &other, const any_policy pol) noexcept
+    basic_any(const basic_any &other, const policy pol) noexcept
         : instance{other.data()},
           info{other.info},
           vtable{other.vtable},
@@ -169,7 +174,7 @@ public:
         : instance{},
           info{},
           vtable{},
-          mode{any_policy::owner} {
+          mode{policy::owner} {
         initialize<Type>(std::forward<Args>(args)...);
     }
 
@@ -209,7 +214,7 @@ public:
 
     /*! @brief Frees the internal storage, whatever it means. */
     ~basic_any() {
-        if(vtable && (mode == any_policy::owner)) {
+        if(vtable && owner()) {
             vtable(operation::destroy, *this, nullptr);
         }
     }
@@ -290,7 +295,7 @@ public:
      * @return An opaque pointer the contained instance, if any.
      */
     [[nodiscard]] void *data() noexcept {
-        return mode == any_policy::cref ? nullptr : const_cast<void *>(std::as_const(*this).data());
+        return mode == policy::cref ? nullptr : const_cast<void *>(std::as_const(*this).data());
     }
 
     /**
@@ -299,7 +304,7 @@ public:
      * @return An opaque pointer the contained instance, if any.
      */
     [[nodiscard]] void *data(const type_info &req) noexcept {
-        return mode == any_policy::cref ? nullptr : const_cast<void *>(std::as_const(*this).data(req));
+        return mode == policy::cref ? nullptr : const_cast<void *>(std::as_const(*this).data(req));
     }
 
     /**
@@ -320,7 +325,7 @@ public:
      * @return True in case of success, false otherwise.
      */
     bool assign(const basic_any &other) {
-        if(vtable && mode != any_policy::cref && *info == *other.info) {
+        if(vtable && mode != policy::cref && *info == *other.info) {
             return (vtable(operation::assign, *this, other.data()) != nullptr);
         }
 
@@ -329,7 +334,7 @@ public:
 
     /*! @copydoc assign */
     bool assign(basic_any &&other) {
-        if(vtable && mode != any_policy::cref && *info == *other.info) {
+        if(vtable && mode != policy::cref && *info == *other.info) {
             if(auto *val = other.data(); val) {
                 return (vtable(operation::transfer, *this, val) != nullptr);
             } else {
@@ -342,7 +347,7 @@ public:
 
     /*! @brief Destroys contained object */
     void reset() {
-        if(vtable && (mode == any_policy::owner)) {
+        if(vtable && owner()) {
             vtable(operation::destroy, *this, nullptr);
         }
 
@@ -350,7 +355,7 @@ public:
         ENTT_ASSERT((instance = nullptr) == nullptr, "");
         info = &type_id<void>();
         vtable = nullptr;
-        mode = any_policy::owner;
+        mode = policy::owner;
     }
 
     /**
@@ -388,28 +393,20 @@ public:
      * @return A wrapper that shares a reference to an unmanaged object.
      */
     [[nodiscard]] basic_any as_ref() noexcept {
-        return basic_any{*this, (mode == any_policy::cref ? any_policy::cref : any_policy::ref)};
+        return basic_any{*this, (mode == policy::cref ? policy::cref : policy::ref)};
     }
 
     /*! @copydoc as_ref */
     [[nodiscard]] basic_any as_ref() const noexcept {
-        return basic_any{*this, any_policy::cref};
+        return basic_any{*this, policy::cref};
     }
 
     /**
      * @brief Returns true if a wrapper owns its object, false otherwise.
      * @return True if the wrapper owns its object, false otherwise.
      */
-    [[deprecated("use policy() and any_policy instead")]] [[nodiscard]] bool owner() const noexcept {
-        return (mode == any_policy::owner);
-    }
-
-    /**
-     * @brief Returns the current mode of an any object.
-     * @return The current mode of the any object.
-     */
-    [[nodiscard]] any_policy policy() const noexcept {
-        return mode;
+    [[nodiscard]] bool owner() const noexcept {
+        return (mode == policy::owner);
     }
 
 private:
@@ -419,7 +416,7 @@ private:
     };
     const type_info *info;
     vtable_type *vtable;
-    any_policy mode;
+    policy mode;
 };
 
 /**

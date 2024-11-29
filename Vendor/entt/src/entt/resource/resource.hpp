@@ -20,6 +20,7 @@ namespace entt {
  */
 template<typename Type>
 class resource {
+    /*! @brief Resource handles are friends with each other. */
     template<typename>
     friend class resource;
 

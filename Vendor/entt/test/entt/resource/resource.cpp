@@ -1,20 +1,17 @@
-#include <memory>
-#include <utility>
 #include <gtest/gtest.h>
 #include <entt/core/type_info.hpp>
 #include <entt/resource/resource.hpp>
-#include "../common/linter.hpp"
 
 struct base {
     virtual ~base() = default;
 
-    [[nodiscard]] virtual const entt::type_info &type() const noexcept {
+    virtual const entt::type_info &type() const noexcept {
         return entt::type_id<base>();
     }
 };
 
 struct derived: base {
-    [[nodiscard]] const entt::type_info &type() const noexcept override {
+    const entt::type_info &type() const noexcept override {
         return entt::type_id<derived>();
     }
 };
@@ -29,7 +26,7 @@ entt::resource<Type> dynamic_resource_cast(const entt::resource<Other> &other) {
 }
 
 TEST(Resource, Functionalities) {
-    const entt::resource<derived> resource{};
+    entt::resource<derived> resource{};
 
     ASSERT_FALSE(resource);
     ASSERT_EQ(resource.operator->(), nullptr);
@@ -59,7 +56,7 @@ TEST(Resource, Functionalities) {
 }
 
 TEST(Resource, DerivedToBase) {
-    const entt::resource<derived> resource{std::make_shared<derived>()};
+    entt::resource<derived> resource{std::make_shared<derived>()};
     entt::resource<base> other{resource};
     entt::resource<const base> cother{resource};
 
@@ -80,13 +77,12 @@ TEST(Resource, ConstNonConstAndAllInBetween) {
     entt::resource<derived> resource{std::make_shared<derived>()};
     entt::resource<derived> other{resource};
 
-    testing::StaticAssertTypeEq<decltype(*resource), derived &>();
-    testing::StaticAssertTypeEq<decltype(*entt::resource<const derived>{other}), const derived &>();
-    testing::StaticAssertTypeEq<decltype(*std::as_const(resource)), derived &>();
+    static_assert(std::is_same_v<decltype(*resource), derived &>);
+    static_assert(std::is_same_v<decltype(*entt::resource<const derived>{other}), const derived &>);
+    static_assert(std::is_same_v<decltype(*std::as_const(resource)), derived &>);
 
     entt::resource<const derived> copy{resource};
     entt::resource<const derived> move{std::move(other)};
-    test::is_initialized(other);
 
     ASSERT_TRUE(resource);
     ASSERT_FALSE(other);
@@ -103,7 +99,6 @@ TEST(Resource, ConstNonConstAndAllInBetween) {
 
     copy = resource;
     move = std::move(resource);
-    test::is_initialized(resource);
 
     ASSERT_FALSE(resource);
     ASSERT_FALSE(other);
@@ -114,7 +109,7 @@ TEST(Resource, ConstNonConstAndAllInBetween) {
 }
 
 TEST(Resource, DynamicResourceHandleCast) {
-    const entt::resource<derived> resource{std::make_shared<derived>()};
+    entt::resource<derived> resource{std::make_shared<derived>()};
     entt::resource<const base> other = resource;
 
     ASSERT_TRUE(other);
@@ -135,8 +130,8 @@ TEST(Resource, DynamicResourceHandleCast) {
 }
 
 TEST(Resource, Comparison) {
-    const entt::resource<derived> resource{std::make_shared<derived>()};
-    const entt::resource<const base> other = resource;
+    entt::resource<derived> resource{std::make_shared<derived>()};
+    entt::resource<const base> other = resource;
 
     ASSERT_TRUE(resource == other);
     ASSERT_FALSE(resource != other);

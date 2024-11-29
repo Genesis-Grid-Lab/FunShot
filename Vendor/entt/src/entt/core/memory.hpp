@@ -12,8 +12,7 @@
 namespace entt {
 
 /**
- * @brief Checks whether a value is a power of two or not (waiting for C++20 and
- * `std::has_single_bit`).
+ * @brief Checks whether a value is a power of two or not.
  * @param value A value that may or may not be a power of two.
  * @return True if the value is a power of two, false otherwise.
  */
@@ -22,8 +21,7 @@ namespace entt {
 }
 
 /**
- * @brief Computes the smallest power of two greater than or equal to a value
- * (waiting for C++20 and `std::bit_ceil`).
+ * @brief Computes the smallest power of two greater than or equal to a value.
  * @param value The value to use.
  * @return The smallest power of two greater than or equal to the given value.
  */
@@ -165,7 +163,11 @@ ENTT_CONSTEXPR auto allocate_unique(Allocator &allocator, Args &&...args) {
     return std::unique_ptr<Type, allocation_deleter<allocator_type>>{ptr, alloc};
 }
 
-/*! @cond TURN_OFF_DOXYGEN */
+/**
+ * @cond TURN_OFF_DOXYGEN
+ * Internal details not to be documented.
+ */
+
 namespace internal {
 
 template<typename Type>
@@ -221,7 +223,11 @@ struct uses_allocator_construction<std::pair<Type, Other>> {
 };
 
 } // namespace internal
-/*! @endcond */
+
+/**
+ * Internal details not to be documented.
+ * @endcond
+ */
 
 /**
  * @brief Uses-allocator construction utility (waiting for C++20).

@@ -5,6 +5,9 @@
 #include <entt/meta/meta.hpp>
 
 struct clazz_t {
+    clazz_t()
+        : value{} {}
+
     void incr() {
         ++value;
     }
@@ -13,7 +16,7 @@ struct clazz_t {
         --value;
     }
 
-    int value{};
+    int value;
 };
 
 struct MetaHandle: ::testing::Test {

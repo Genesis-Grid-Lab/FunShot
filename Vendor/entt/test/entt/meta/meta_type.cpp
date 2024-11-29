@@ -14,7 +14,6 @@
 #include <entt/meta/factory.hpp>
 #include <entt/meta/meta.hpp>
 #include <entt/meta/pointer.hpp>
-#include <entt/meta/range.hpp>
 #include <entt/meta/resolve.hpp>
 #include <entt/meta/template.hpp>
 #include "../common/config.h"
@@ -30,7 +29,10 @@ Type get(Type &prop) {
 }
 
 struct base_t {
-    char value{'c'};
+    base_t()
+        : value{'c'} {};
+
+    char value;
 };
 
 struct derived_t: base_t {
@@ -63,7 +65,7 @@ struct clazz_t {
     void member() {}
     static void func() {}
 
-    [[nodiscard]] operator int() const {
+    operator int() const {
         return value;
     }
 
@@ -71,37 +73,37 @@ struct clazz_t {
 };
 
 struct overloaded_func_t {
-    [[nodiscard]] int e(int v) const {
+    int e(int v) const {
         return v + v;
     }
 
-    [[nodiscard]] int f(const base_t &, int a, int b) {
+    int f(const base_t &, int a, int b) {
         return f(a, b);
     }
 
-    [[nodiscard]] int f(int a, int b) { // NOLINT
+    int f(int a, int b) {
         value = a;
         return g(b);
     }
 
-    [[nodiscard]] int f(int v) {
+    int f(int v) {
         return 2 * std::as_const(*this).f(v);
     }
 
-    [[nodiscard]] int f(int v) const {
+    int f(int v) const {
         return g(v);
     }
 
-    [[nodiscard]] float f(int a, float b) { // NOLINT
+    float f(int a, float b) {
         value = a;
         return static_cast<float>(e(static_cast<int>(b)));
     }
 
-    [[nodiscard]] int g(int v) const {
+    int g(int v) const {
         return v * v;
     }
 
-    int value{};
+    inline static int value = 0;
 };
 
 enum class property_t : entt::id_type {
@@ -122,7 +124,7 @@ struct MetaType: ::testing::Test {
         entt::meta<unsigned int>()
             .type("unsigned int"_hs)
             .data<0u>("min"_hs)
-            .data<100u>("max"_hs); // NOLINT
+            .data<100u>("max"_hs);
 
         entt::meta<base_t>()
             .type("base"_hs)
@@ -172,7 +174,7 @@ struct MetaType: ::testing::Test {
 
         entt::meta<clazz_t>()
             .type("clazz"_hs)
-            .prop(static_cast<entt::id_type>(property_t::value), 42) // NOLINT
+            .prop(static_cast<entt::id_type>(property_t::value), 42)
             .ctor<const base_t &, int>()
             .data<&clazz_t::value>("value"_hs)
             .func<&clazz_t::member>("member"_hs)
@@ -220,7 +222,7 @@ TEST_F(MetaType, Functionalities) {
     ASSERT_EQ(type.id(), "clazz"_hs);
     ASSERT_EQ(type.info(), entt::type_id<clazz_t>());
 
-    for(auto &&curr: type.prop()) {
+    for(auto curr: type.prop()) {
         ASSERT_EQ(curr.first, static_cast<entt::id_type>(property_t::value));
         ASSERT_EQ(curr.second.value(), 42);
     }
@@ -237,8 +239,8 @@ TEST_F(MetaType, Functionalities) {
 TEST_F(MetaType, SizeOf) {
     ASSERT_EQ(entt::resolve<void>().size_of(), 0u);
     ASSERT_EQ(entt::resolve<int>().size_of(), sizeof(int));
-    ASSERT_EQ(entt::resolve<int[]>().size_of(), 0u);              // NOLINT
-    ASSERT_EQ(entt::resolve<int[3]>().size_of(), sizeof(int[3])); // NOLINT
+    ASSERT_EQ(entt::resolve<int[]>().size_of(), 0u);
+    ASSERT_EQ(entt::resolve<int[3]>().size_of(), sizeof(int[3]));
 }
 
 TEST_F(MetaType, Traits) {
@@ -254,8 +256,8 @@ TEST_F(MetaType, Traits) {
     ASSERT_FALSE(entt::resolve<unsigned int>().is_signed());
     ASSERT_FALSE(entt::resolve<clazz_t>().is_signed());
 
-    ASSERT_TRUE(entt::resolve<int[5]>().is_array());    // NOLINT
-    ASSERT_TRUE(entt::resolve<int[5][3]>().is_array()); // NOLINT
+    ASSERT_TRUE(entt::resolve<int[5]>().is_array());
+    ASSERT_TRUE(entt::resolve<int[5][3]>().is_array());
     ASSERT_FALSE(entt::resolve<int>().is_array());
 
     ASSERT_TRUE(entt::resolve<property_t>().is_enum());
@@ -300,33 +302,8 @@ TEST_F(MetaType, TemplateInfo) {
     ASSERT_EQ(entt::resolve<std::shared_ptr<int>>().template_arg(1u), entt::meta_type{});
 }
 
-TEST_F(MetaType, CanCast) {
-    auto type = entt::resolve<derived_t>();
-
-    ASSERT_FALSE(type.can_cast(entt::resolve<void>()));
-    ASSERT_TRUE(type.can_cast(entt::resolve<base_t>()));
-    ASSERT_TRUE(type.can_cast(entt::resolve<derived_t>()));
-}
-
-TEST_F(MetaType, CanConvert) {
-    auto clazz = entt::resolve<clazz_t>();
-    auto derived = entt::resolve<derived_t>();
-    auto arithmetic = entt::resolve<int>();
-
-    ASSERT_TRUE(clazz.can_convert(entt::resolve<clazz_t>()));
-    ASSERT_TRUE(clazz.can_convert(entt::resolve<int>()));
-
-    ASSERT_TRUE(derived.can_convert(entt::resolve<derived_t>()));
-    ASSERT_TRUE(derived.can_convert(entt::resolve<base_t>()));
-    ASSERT_FALSE(derived.can_convert(entt::resolve<int>()));
-
-    ASSERT_TRUE(arithmetic.can_convert(entt::resolve<int>()));
-    ASSERT_FALSE(arithmetic.can_convert(entt::resolve<clazz_t>()));
-    ASSERT_TRUE(arithmetic.can_convert(entt::resolve<double>()));
-    ASSERT_TRUE(arithmetic.can_convert(entt::resolve<float>()));
-}
-
 TEST_F(MetaType, Base) {
+    using namespace entt::literals;
     auto type = entt::resolve<derived_t>();
 
     ASSERT_NE(type.base().cbegin(), type.base().cend());
@@ -358,7 +335,7 @@ TEST_F(MetaType, Data) {
     auto type = entt::resolve<clazz_t>();
     int counter{};
 
-    for([[maybe_unused]] auto &&curr: type.data()) {
+    for([[maybe_unused]] auto curr: type.data()) {
         ++counter;
     }
 
@@ -378,7 +355,7 @@ TEST_F(MetaType, Func) {
     clazz_t instance{};
     int counter{};
 
-    for([[maybe_unused]] auto &&curr: type.func()) {
+    for([[maybe_unused]] auto curr: type.func()) {
         ++counter;
     }
 
@@ -431,42 +408,42 @@ TEST_F(MetaType, OverloadedFunc) {
     res = type.invoke("f"_hs, instance, base_t{}, 1, 2);
 
     ASSERT_TRUE(res);
-    ASSERT_EQ(instance.value, 1);
+    ASSERT_EQ(overloaded_func_t::value, 1);
     ASSERT_NE(res.try_cast<int>(), nullptr);
     ASSERT_EQ(res.cast<int>(), 4);
 
     res = type.invoke("f"_hs, instance, 3, 4);
 
     ASSERT_TRUE(res);
-    ASSERT_EQ(instance.value, 3);
+    ASSERT_EQ(overloaded_func_t::value, 3);
     ASSERT_NE(res.try_cast<int>(), nullptr);
     ASSERT_EQ(res.cast<int>(), 16);
 
-    res = type.invoke("f"_hs, instance, 5); // NOLINT
+    res = type.invoke("f"_hs, instance, 5);
 
     ASSERT_TRUE(res);
-    ASSERT_EQ(instance.value, 3);
+    ASSERT_EQ(overloaded_func_t::value, 3);
     ASSERT_NE(res.try_cast<int>(), nullptr);
     ASSERT_EQ(res.cast<int>(), 50);
 
-    res = type.invoke("f"_hs, std::as_const(instance), 5); // NOLINT
+    res = type.invoke("f"_hs, std::as_const(instance), 5);
 
     ASSERT_TRUE(res);
-    ASSERT_EQ(instance.value, 3);
+    ASSERT_EQ(overloaded_func_t::value, 3);
     ASSERT_NE(res.try_cast<int>(), nullptr);
     ASSERT_EQ(res.cast<int>(), 25);
 
-    res = type.invoke("f"_hs, instance, 6, 7.f); // NOLINT
+    res = type.invoke("f"_hs, instance, 6, 7.f);
 
     ASSERT_TRUE(res);
-    ASSERT_EQ(instance.value, 6);
+    ASSERT_EQ(overloaded_func_t::value, 6);
     ASSERT_NE(res.try_cast<float>(), nullptr);
     ASSERT_EQ(res.cast<float>(), 14.f);
 
     res = type.invoke("f"_hs, instance, 8, 9.f);
 
     ASSERT_TRUE(res);
-    ASSERT_EQ(instance.value, 8);
+    ASSERT_EQ(overloaded_func_t::value, 8);
     ASSERT_NE(res.try_cast<float>(), nullptr);
     ASSERT_EQ(res.cast<float>(), 18.f);
 
@@ -475,7 +452,7 @@ TEST_F(MetaType, OverloadedFunc) {
 }
 
 TEST_F(MetaType, Construct) {
-    auto any = entt::resolve<clazz_t>().construct(base_t{}, 42); // NOLINT
+    auto any = entt::resolve<clazz_t>().construct(base_t{}, 42);
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.cast<clazz_t>().value, 42);
@@ -489,7 +466,7 @@ TEST_F(MetaType, ConstructNoArgs) {
 }
 
 TEST_F(MetaType, ConstructMetaAnyArgs) {
-    auto any = entt::resolve<clazz_t>().construct(entt::meta_any{base_t{}}, entt::meta_any{42}); // NOLINT
+    auto any = entt::resolve<clazz_t>().construct(entt::meta_any{base_t{}}, entt::meta_any{42});
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.cast<clazz_t>().value, 42);
@@ -504,7 +481,7 @@ TEST_F(MetaType, LessArgs) {
 }
 
 TEST_F(MetaType, ConstructCastAndConvert) {
-    auto any = entt::resolve<clazz_t>().construct(derived_t{}, clazz_t{derived_t{}, 42}); // NOLINT
+    auto any = entt::resolve<clazz_t>().construct(derived_t{}, clazz_t{derived_t{}, 42});
 
     ASSERT_TRUE(any);
     ASSERT_EQ(any.cast<clazz_t>().value, 42);
@@ -518,6 +495,8 @@ TEST_F(MetaType, ConstructArithmeticConversion) {
 }
 
 TEST_F(MetaType, FromVoid) {
+    using namespace entt::literals;
+
     ASSERT_FALSE(entt::resolve<double>().from_void(static_cast<double *>(nullptr)));
     ASSERT_FALSE(entt::resolve<double>().from_void(static_cast<const double *>(nullptr)));
 
@@ -610,7 +589,7 @@ TEST_F(MetaType, AbstractClass) {
     ASSERT_EQ(instance.base_t::value, 'c');
     ASSERT_EQ(instance.value, 3);
 
-    type.func("func"_hs).invoke(instance, 42); // NOLINT
+    type.func("func"_hs).invoke(instance, 42);
 
     ASSERT_EQ(instance.base_t::value, 'c');
     ASSERT_EQ(instance.value, 42);
@@ -739,7 +718,7 @@ TEST_F(MetaType, ResetAndReRegistrationAfterReset) {
     entt::meta<property_t>()
         .type("property"_hs)
         .data<property_t::random>("rand"_hs)
-        .prop(static_cast<entt::id_type>(property_t::value), 42) // NOLINT
+        .prop(static_cast<entt::id_type>(property_t::value), 42)
         .prop(static_cast<entt::id_type>(property_t::random), 3);
 
     ASSERT_TRUE(entt::resolve<property_t>().data("rand"_hs).prop(static_cast<entt::id_type>(property_t::value)));
@@ -774,10 +753,10 @@ TEST_F(MetaType, ReRegistration) {
 TEST_F(MetaType, NameCollision) {
     using namespace entt::literals;
 
-    ASSERT_NO_THROW(entt::meta<clazz_t>().type("clazz"_hs));
+    ASSERT_NO_FATAL_FAILURE(entt::meta<clazz_t>().type("clazz"_hs));
     ASSERT_TRUE(entt::resolve("clazz"_hs));
 
-    ASSERT_NO_THROW(entt::meta<clazz_t>().type("quux"_hs));
+    ASSERT_NO_FATAL_FAILURE(entt::meta<clazz_t>().type("quux"_hs));
     ASSERT_FALSE(entt::resolve("clazz"_hs));
     ASSERT_TRUE(entt::resolve("quux"_hs));
 }
