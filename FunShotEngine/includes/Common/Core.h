@@ -39,44 +39,44 @@
 #include <spdlog/sinks/stdout_color_sinks.h>
 
 // import, export
-#ifdef GEN_EXPORT
+#ifdef FS_EXPORT
     #ifdef _MSC_VER
-        #define GEN_API __declspec(dllexport)
+        #define FS_API __declspec(dllexport)
     #else
-        #define GEN_API __attribute__((visibility("default")))
+        #define FS_API __attribute__((visibility("default")))
     #endif
 #else
     #ifdef _MSC_VER
-        #define GEN_API __declspec(dllimport)
+        #define FS_API __declspec(dllimport)
     #else
-        #define GEN_API
+        #define FS_API
     #endif
 #endif
 
 // runtime assertion
-#define GEN_ASSERT assert
+#define FS_ASSERT assert
 
 // compile assertion
 #if defined(__clang__) || defined(__gcc__)
-    #define GEN_STATIC_ASSERT _Static_assert
+    #define FS_STATIC_ASSERT _Static_assert
 #else
-    #define GEN_STATIC_ASSERT static_assert
+    #define FS_STATIC_ASSERT static_assert
 #endif
 
 // function inlining
 #if defined(__clang__) || defined(__gcc__)
-    #define GEN_INLINE __attribute__((always_inline)) inline
-    #define GEN_NOINLINE __attribute__((noinline))
+    #define FS_INLINE __attribute__((always_inline)) inline
+    #define FS_NOINLINE __attribute__((noinline))
 #elif defined(_MSC_VER)
-    #define GEN_INLINE __forceinline
-    #define GEN_NOINLINE __declspec(noinline)
+    #define FS_INLINE __forceinline
+    #define FS_NOINLINE __declspec(noinline)
 #else
-    #define GEN_INLINE inline
-    #define GEN_NOINLINE
+    #define FS_INLINE inline
+    #define FS_NOINLINE
 #endif
 
 // core features
-namespace Gen
+namespace FS
 {
     // entity identifier
     using EntityID = entt::entity;
@@ -87,13 +87,13 @@ namespace Gen
 
     // runtime type
     template <typename T>
-    GEN_INLINE constexpr uint32_t TypeID()
+    FS_INLINE constexpr uint32_t TypeID()
     {
         return static_cast<uint32_t>(reinterpret_cast<std::uintptr_t>(&typeid(T)));
     }
 
     // generate random 64 bit
-    GEN_INLINE uint64_t RandomU64() 
+    FS_INLINE uint64_t RandomU64() 
     {
         static std::random_device device;
         static std::mt19937_64 generator(device());
@@ -102,18 +102,18 @@ namespace Gen
     }
 
     // console logging
-    struct GEN_API Logger 
+    struct FS_API Logger 
     { 
         using SPDLog = std::shared_ptr<spdlog::logger>;
 
-        GEN_INLINE Logger()
+        FS_INLINE Logger()
         {
             m_SPD = spdlog::stdout_color_mt("stdout");
             spdlog::set_level(spdlog::level::trace);              
             spdlog::set_pattern("%^[%T]: [#%t] %v%$");
         }
 
-        GEN_INLINE static SPDLog& Ref() 
+        FS_INLINE static SPDLog& Ref() 
         {
             static Logger logger;
             return logger.m_SPD;
@@ -157,26 +157,26 @@ namespace Gen
     }
 }
 
-#define GLCheck(x) Gen::GLClearAllErrors(); x; GLCheckErrorStatus(#x, __LINE__);
+#define GLCheck(x) FS::GLClearAllErrors(); x; GLCheckErrorStatus(#x, __LINE__);
 
     // logging macros 
-#ifdef GEN_ENABLE_LOG
-    #define GEN_TRACE(...) Gen::Logger::Ref()->trace(__VA_ARGS__)
-    #define GEN_DEBUG(...) Gen::Logger::Ref()->debug(__VA_ARGS__)
-    #define GEN_INFO(...)  Gen::Logger::Ref()->info(__VA_ARGS__)
-    #define GEN_WARN(...)  Gen::Logger::Ref()->warn(__VA_ARGS__)
-    #define GEN_ERROR(...) Gen::Logger::Ref()->error(__VA_ARGS__)
-    #define GEN_FATAL(...) Gen::Logger::Ref()->critical(__VA_ARGS__)
+#ifdef FS_ENABLE_LOG
+    #define FS_TRACE(...) FS::Logger::Ref()->trace(__VA_ARGS__)
+    #define FS_DEBUG(...) FS::Logger::Ref()->debug(__VA_ARGS__)
+    #define FS_INFO(...)  FS::Logger::Ref()->info(__VA_ARGS__)
+    #define FS_WARN(...)  FS::Logger::Ref()->warn(__VA_ARGS__)
+    #define FS_ERROR(...) FS::Logger::Ref()->error(__VA_ARGS__)
+    #define FS_FATAL(...) FS::Logger::Ref()->critical(__VA_ARGS__)
      
 #else
-	#define GEN_TRACE
-	#define GEN_DEBUG
-	#define GEN_ERROR	
-	#define GEN_FATAL
-	#define GEN_INFO
-    #define GEN_WARN
+	#define FS_TRACE
+	#define FS_DEBUG
+	#define FS_ERROR	
+	#define FS_FATAL
+	#define FS_INFO
+    #define FS_WARN
     #define GLCheck(x)
 #endif
 
 // free allocated memory
-#define GEN_DELETE(ptr) if (ptr != nullptr) { delete (ptr); ptr = nullptr; }
+#define FS_DELETE(ptr) if (ptr != nullptr) { delete (ptr); ptr = nullptr; }

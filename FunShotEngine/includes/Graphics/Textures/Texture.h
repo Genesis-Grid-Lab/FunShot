@@ -3,20 +3,20 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
-namespace Gen
+namespace FS
 {  
     struct Texture2D 
     {   
-        GEN_INLINE Texture2D(const std::string& path, bool isHDR, bool flipY) 
+        FS_INLINE Texture2D(const std::string& path, bool isHDR, bool flipY) 
         { 
             Load(path, isHDR, flipY); 
         }
 
-        GEN_INLINE Texture2D(const std::string& path) { Load(path); }
-        GEN_INLINE ~Texture2D() { glDeleteTextures(1, &m_ID); }
-        GEN_INLINE Texture2D() = default;
+        FS_INLINE Texture2D(const std::string& path) { Load(path); }
+        FS_INLINE ~Texture2D() { glDeleteTextures(1, &m_ID); }
+        FS_INLINE Texture2D() = default;
 
-        GEN_INLINE bool Load(const std::string& path, bool isHDR = false, bool flipY = true) 
+        FS_INLINE bool Load(const std::string& path, bool isHDR = false, bool flipY = true) 
         {
             // flip y axis (common)
             stbi_set_flip_vertically_on_load(flipY);
@@ -36,7 +36,7 @@ namespace Gen
             // check pixels
             if(pixels == nullptr) 
             { 
-                GEN_ERROR("failed to load texture!");
+                FS_ERROR("failed to load texture!");
                 return false; 
             }
 
@@ -68,15 +68,15 @@ namespace Gen
             return true;     
         } 
       
-        GEN_INLINE operator uint32_t() const { return m_ID; }
-        GEN_INLINE int32_t Height() const { return m_Height; }
-        GEN_INLINE int32_t Width() const { return m_Width; }
-        GEN_INLINE uint32_t ID() const { return m_ID; }
+        FS_INLINE operator uint32_t() const { return m_ID; }
+        FS_INLINE int32_t Height() const { return m_Height; }
+        FS_INLINE int32_t Width() const { return m_Width; }
+        FS_INLINE uint32_t ID() const { return m_ID; }
 
-        GEN_INLINE void Bind() { glBindTexture(GL_TEXTURE_2D, m_ID); }
-        GEN_INLINE void Unbind() { glBindTexture(GL_TEXTURE_2D, 0); }
+        FS_INLINE void Bind() { glBindTexture(GL_TEXTURE_2D, m_ID); }
+        FS_INLINE void Unbind() { glBindTexture(GL_TEXTURE_2D, 0); }
 
-        GEN_INLINE void Use(uint32_t uniform, int32_t unit) 
+        FS_INLINE void Use(uint32_t uniform, int32_t unit) 
         { 
             glActiveTexture(GL_TEXTURE0 + unit);
             glBindTexture(GL_TEXTURE_2D, m_ID);

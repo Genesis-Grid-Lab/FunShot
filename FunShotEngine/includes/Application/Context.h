@@ -4,7 +4,7 @@
 #include "../Graphics/Renderer.h"
 #include "../Auxiliaries/Serializer.h"
 
-namespace Gen
+namespace FS
 {
     // forward declaration
     struct AppInterface;    
@@ -12,7 +12,7 @@ namespace Gen
     // application context
     struct AppContext
     {
-        GEN_INLINE AppContext()
+        FS_INLINE AppContext()
         {
             Window = std::make_unique<AppWindow>(&Dispatcher, 1280, 720, "FunShot Engine");
             Scripts = std::make_unique<ScriptContext>(&Scene, Window.get());
@@ -23,11 +23,11 @@ namespace Gen
             DeltaTime = 0.0;
         }
 
-        GEN_INLINE ~AppContext()
+        FS_INLINE ~AppContext()
         {
             for(auto layer : Layers)
             {
-                GEN_DELETE(layer);
+                FS_DELETE(layer);
             } 
         }
         

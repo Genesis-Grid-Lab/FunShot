@@ -1,12 +1,12 @@
 #pragma once
 #include "Interface.h"
 
-namespace Gen
+namespace FS
 {
     struct Application : AppInterface
     {
         // runs application main loop
-        GEN_INLINE void RunContext(bool showFrame)
+        FS_INLINE void RunContext(bool showFrame)
         {          
             // application main loop
             while(m_Context->Window->PollEvents())
@@ -32,13 +32,13 @@ namespace Gen
         }
 
         // destroy application context
-        GEN_INLINE ~Application() 
+        FS_INLINE ~Application() 
         {
-            GEN_DELETE(m_Context);
+            FS_DELETE(m_Context);
         }
 
         // creates application context
-        GEN_INLINE Application() 
+        FS_INLINE Application() 
         {
             // create application context
             m_LayerID = TypeID<Application>();                   
@@ -53,7 +53,7 @@ namespace Gen
 
     private:   
         // registers event callback functions
-        GEN_INLINE void RegisterCallbacks()
+        FS_INLINE void RegisterCallbacks()
         {
             // set physics event callback
             m_Context->Physics->SetEventCallback([this] (auto e)
@@ -131,7 +131,7 @@ namespace Gen
         }
 
         // computes frame delta time value
-        GEN_INLINE void UpdateDeltaTime()
+        FS_INLINE void UpdateDeltaTime()
         {
             static double sLastTime = glfwGetTime();
             double currentTime = glfwGetTime();
@@ -140,7 +140,7 @@ namespace Gen
         }
        
         // creates entities with components
-        GEN_INLINE void CreateEntities()
+        FS_INLINE void CreateEntities()
         {      
             // load assets
             auto skyboxAsset = m_Context->Assets->AddSkybox(RandomU64(), "Resources/Textures/HDRs/Sky.hdr", 2048);
@@ -215,7 +215,7 @@ namespace Gen
         }
         
         // updates all application layers
-        // GEN_INLINE void UpdateLayers()
+        // FS_INLINE void UpdateLayers()
         // {            
         //     for(auto layer : m_Context->Layers)
         //     {
@@ -227,7 +227,7 @@ namespace Gen
         // }      
 
         // updates physcis, scripts, etc.
-        GEN_INLINE void UpdateScene()
+        FS_INLINE void UpdateScene()
         {
             // update script instances
             EnttView<Entity, ScriptComponent>([this] (auto entity, auto& script) 
@@ -254,7 +254,7 @@ namespace Gen
         }
 
         // renders depth map, color, etc.
-        GEN_INLINE void RenderScene()
+        FS_INLINE void RenderScene()
         {
             // ----------------------------- SHADWO MAP -------------------------------------
 
@@ -349,7 +349,7 @@ namespace Gen
         }       
                        
         // starts physics, scripts, etc.
-        GEN_INLINE void StartScene()
+        FS_INLINE void StartScene()
         {
             // create scene entities
             CreateEntities();

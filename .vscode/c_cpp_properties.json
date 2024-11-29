@@ -22,8 +22,8 @@
             ],
             "configurationProvider": "ms-vscode.cmake-tools",
             "defines": [
-                "GEN_EXPORT",
-                "GEN_ENABLE_LOG"
+                "FS_EXPORT",
+                "FS_ENABLE_LOG"
             ],
             "intelliSenseMode": "${default}",
             "cppStandard": "c++17",
