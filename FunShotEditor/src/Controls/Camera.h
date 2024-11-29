@@ -11,9 +11,11 @@ struct CameraControl : IControl<CameraComponent>
     GEN_INLINE void OnBody(GuiContext* context, Entity& entity) 
 	{
         auto& data = entity.template Get<CameraComponent>().Camera;
+        auto& use = entity.template Get<CameraComponent>().Use;
         InputFloat("Near", &data.NearPlane);
         InputFloat("Far", &data.FarPlane);
-        InputFloat("FOV", &data.FOV);    
+        InputFloat("FOV", &data.FOV);
+        InputBool("Use", &use);
     }
 
     GEN_INLINE void OnMenu(GuiContext* context, Entity& entity) 
