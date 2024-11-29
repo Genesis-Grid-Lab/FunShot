@@ -152,6 +152,11 @@ namespace Gen
             auto mtlAsset = m_Context->Assets->AddMaterial(RandomU64(), "Nimrod");
             mtlAsset->Data.Albedo.x = 0.0f;
             
+            // create global camera
+            auto globCam = CreateEntt<Entity>();
+            globCam.Attach<TransformComponent>().Transform;
+            globCam.Attach<CameraComponent>();
+            
             // create scene camera
             auto camera = CreateEntt<Entity>();                    
             camera.Attach<InfoComponent>().Name = "Camera";
@@ -284,10 +289,22 @@ namespace Gen
             m_Context->Renderer->NewFrame(); 
                                 
             // set shader camera
-            EnttView<Entity, CameraComponent>([this] (auto entity, auto& comp) 
+            EnttView<Entity, GlobalCamComponent>([this] (auto entity, auto& comp) 
             {      
-                auto& transform = entity.template Get<TransformComponent>().Transform;
-                m_Context->Renderer->SetCamera(comp.Camera, transform);
+                auto& globTransform = entity.template Get<TransformComponent>().Transform;
+                auto& globCam = comp.Camera;
+                
+                EnttView<Entity, CameraComponent>([this, &globTransform, &globCam] (auto entity, auto& comp) 
+                {      
+                    auto& transform = entity.template Get<TransformComponent>().Transform;
+                    if(comp.Use){
+                        m_Context->Renderer->SetCamera(comp.Camera, transform);
+                    }
+                    else{
+                        m_Context->Renderer->SetCamera(globCam, globTransform);
+                    }
+                });
+                
             });
             
             // set shader point lights
