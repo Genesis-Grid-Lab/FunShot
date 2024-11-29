@@ -49,15 +49,24 @@ namespace Gen
         GEN_INLINE ColliderComponent(const ColliderComponent&) = default;
         GEN_INLINE ColliderComponent() = default; 
         Collider3D Collider;
-    }; 
+    };
+    
+    // global camera component
+    struct GlobalCamComponent
+    {
+        FS_INLINE GlobalCamComponent(const GlobalCamComponent&) = default;
+        FS_INLINE GlobalCamComponent() = default;
+        Camera3D Camera;
+    };
 
     // camera component
     struct CameraComponent 
     {
         GEN_INLINE CameraComponent(const CameraComponent&) = default;
         GEN_INLINE CameraComponent() = default; 
-        Camera3D Camera; 
-    }; 
+        Camera3D Camera;
+        bool Use = false;
+    };
 
     // camera 2d component
     struct Camera2DComponent

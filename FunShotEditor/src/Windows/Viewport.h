@@ -36,7 +36,7 @@ struct ViewportWindow : IWidget
 					{
 						float sensibility = 50;
 
-						context->EnttView<Entity, CameraComponent>([&] (auto entity, auto& comp) 
+						context->EnttView<Entity, GlobCamComponent>([&] (auto entity, auto& comp) 
 						{
 							auto& transform = entity.template Get<TransformComponent>().Transform;
 							transform.Translate.z -= (io.MouseWheel * io.DeltaTime * sensibility);
@@ -48,7 +48,7 @@ struct ViewportWindow : IWidget
 					{
 						float sensibility = 10;
 
-						context->EnttView<Entity, CameraComponent>([&] (auto entity, auto& comp) 
+						context->EnttView<Entity, GlobCamComponent>([&] (auto entity, auto& comp) 
 						{
 							auto& transform = entity.template Get<TransformComponent>().Transform;
 							transform.Rotation.x += (io.MouseDelta.y * io.DeltaTime * sensibility);
@@ -58,7 +58,7 @@ struct ViewportWindow : IWidget
 
 					if(ImGui::IsMouseDragging(ImGuiMouseButton_Right) && ImGui::IsKeyPressed(ImGuiKey_D))
 					{
-						context->EnttView<Entity, CameraComponent>([&] (auto entity, auto& comp)
+						context->EnttView<Entity, GlobCamComponent>([&] (auto entity, auto& comp)
 						{
 							auto& transform = entity.template Get<TransformComponent>().Transform;
 							transform.Translate.x += 10;
@@ -67,7 +67,7 @@ struct ViewportWindow : IWidget
 
 					if(ImGui::IsMouseDragging(ImGuiMouseButton_Right) && ImGui::IsKeyPressed(ImGuiKey_A))
 					{
-						context->EnttView<Entity, CameraComponent>([&] (auto entity, auto& comp)
+						context->EnttView<Entity, GlobCamComponent>([&] (auto entity, auto& comp)
 						{
 							auto& transform = entity.template Get<TransformComponent>().Transform;
 							transform.Translate.x -= 10;
@@ -76,7 +76,7 @@ struct ViewportWindow : IWidget
 
 					if(ImGui::IsMouseDragging(ImGuiMouseButton_Right) && ImGui::IsKeyPressed(ImGuiKey_W))
 					{
-						context->EnttView<Entity, CameraComponent>([&] (auto entity, auto& comp)
+						context->EnttView<Entity, GlobCamComponent>([&] (auto entity, auto& comp)
 						{
 							auto& transform = entity.template Get<TransformComponent>().Transform;
 							transform.Translate.z -= 10;
@@ -85,7 +85,7 @@ struct ViewportWindow : IWidget
 
 					if(ImGui::IsMouseDragging(ImGuiMouseButton_Right) && ImGui::IsKeyPressed(ImGuiKey_S))
 					{
-						context->EnttView<Entity, CameraComponent>([&] (auto entity, auto& comp)
+						context->EnttView<Entity, GlobCamComponent>([&] (auto entity, auto& comp)
 						{
 							auto& transform = entity.template Get<TransformComponent>().Transform;
 							transform.Translate.z += 10;
