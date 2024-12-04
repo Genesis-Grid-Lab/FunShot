@@ -2,15 +2,13 @@
     "configurations": [
         {
             "includePath": [
-                "${workspaceFolder}/FunShotEngine/include",
-                "${workspaceFolder}/FunShotEditor/src",
-                "${workspaceFolder}/FunShotEditor/src/Vendors/imgui",
-                "${workspaceFolder}/FunShotGame/src",
-                "${workspaceFolder}/Vendor/assimp/include",
-                "${workspaceFolder}/Vendor/entt/src",
-                "${workspaceFolder}/Vendor/glew/include",
+                "${workspaceFolder}/include",
+                "${workspaceFolder}/FunShot/src",
+                "${workspaceFolder}/FunShot/src/Engine",                
+                "${workspaceFolder}/Vendor/imgui",
                 "${workspaceFolder}/Vendor/glfw/include",
                 "${workspaceFolder}/Vendor/glm",
+                "${workspaceFolder}/Vendor/glad/include",
                 "${workspaceFolder}/Vendor/stb",
                 "${workspaceFolder}/Vendor/spdlog/include",
                 "${workspaceFolder}/Vendor/magic_enum/include",
@@ -22,8 +20,9 @@
             ],
             "configurationProvider": "ms-vscode.cmake-tools",
             "defines": [
-                "GEN_EXPORT",
-                "GEN_ENABLE_LOG"
+                "FS_NO_DLL",         
+                "FS_PLATFORM_WINDOW",
+                "FS_DEBUG"
             ],
             "intelliSenseMode": "${default}",
             "cppStandard": "c++17",

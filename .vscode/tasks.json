@@ -3,7 +3,7 @@
     "tasks": [
         {
             "type": "shell",
-            "label": "Genesis-Debug",
+            "label": "FunShot-Debug",
             "problemMatcher":["$gcc"],
             "options": {"cwd": "${workspaceFolder}"},
             "group": {
@@ -12,31 +12,31 @@
             },
             "windows": {
                 "args": ["Debug"],
-                "command": "${workspaceFolder}/GenesisWin.bat"
+                "command": "${workspaceFolder}/FunShotWin.bat"
             },
 
             "linux": {
                 "sudo":true,
                 "args": ["Debug"],
-                "command": "${workspaceFolder}/GenesisLinux.sh"
+                "command": "${workspaceFolder}/FunShotLinux.sh"
             }
         },
 
         {
             "type": "shell",
-            "label": "Genesis-Release",
+            "label": "FunShot-Release",
             "problemMatcher":["$gcc"],
             "group": {"kind": "build"},
             "options": {"cwd": "${workspaceFolder}"},
             "windows":{
                 "args": ["Release"],
-                "command": "${workspaceFolder}/GenesisWin.bat"
+                "command": "${workspaceFolder}/FunShotWin.bat"
             },
 
             "linux":{
                 "sudo":true,
                 "args":["Release"],
-                "command": "${workspaceFolder}/GenesisLinux.sh"
+                "command": "${workspaceFolder}/FunShotLinux.sh"
             }
         }
     ]

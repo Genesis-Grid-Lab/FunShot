@@ -18,33 +18,34 @@ set(CMAKE_CXX_STANDARD 17)
 
 project(FunShotEngine)
 
+if(WIN32)
+    add_definitions(-DFS_PLATFORM_WINDOW)
+endif(WIN32)
+
+add_definitions(-DFS_NO_DLL)
+
+if(WIN32)    
+    set(CMAKE_CXX_FLAGS_RELEASE "/wd4996")
+    set(CMAKE_CXX_FLAGS_DEBUG "/wd4996")
+endif(WIN32)
+
 # enable console logging
 
 if(${CMAKE_BUILD_TYPE} MATCHES Debug)
-    add_definitions(-DGEN_ENABLE_LOG)
+    add_definitions(-DFS_DEBUG)
 endif(${CMAKE_BUILD_TYPE} MATCHES Debug)
 
 add_subdirectory(Vendor/glfw)
-add_subdirectory(Vendor/glew/build/cmake)
+add_subdirectory(Vendor/glad)
 add_subdirectory(Vendor/glm)
-add_subdirectory(Vendor/entt)
-add_subdirectory(Vendor/assimp)
+# add_subdirectory(Vendor/entt)
+add_subdirectory(Vendor/imgui)
 add_subdirectory(Vendor/spdlog)
-add_subdirectory(Vendor/magic_enum)
-add_subdirectory(Vendor/lua)
-add_subdirectory(Vendor/sol2)
-set(BUILD_SHARED_LIBS ON)
-add_subdirectory(Vendor/yaml-cpp)
+# add_subdirectory(Vendor/magic_enum)
+# add_subdirectory(Vendor/lua)
+# add_subdirectory(Vendor/sol2)
+# set(BUILD_SHARED_LIBS ON)
+# add_subdirectory(Vendor/yaml-cpp)
 
-# project subdirectories
-
-add_subdirectory(FunShotEngine)
-add_subdirectory(FunShotEditor)
-#add_subdirectory(FunShotGame)
-
-if (MSVC)
-  add_compile_options(/bigobj)
-  #target_compile_options(${PROJECT_NAME} PRIVATE /bigobj)
-else ()
-  add_compile_options(-Wa,-mbig-obj)
-endif ()
+add_subdirectory(Funshot)
+add_subdirectory(SandBox)
