@@ -24,7 +24,7 @@ public:
     }
 
     void OnEvent(FS::Event& event) override {
-        FS_TRACE("{0}", event);        
+        // FS_TRACE("{0}", event);        
     }
 };
 
