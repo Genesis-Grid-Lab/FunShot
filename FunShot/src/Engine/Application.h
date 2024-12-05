@@ -8,6 +8,7 @@
 
 #include "Engine/Renderer/Shader.h"
 #include "Engine/Renderer/Buffer.h"
+#include "Engine/Renderer/VertexArray.h"
 
 namespace FS {
 
@@ -34,11 +35,12 @@ namespace FS {
         ImGuiLayer* m_ImGuiLayer;
         bool m_Running = true;
         LayerStack m_LayerStack;
+        
+        std::shared_ptr<Shader> shader;
+        std::shared_ptr<VertexArray> m_VertexArray;
 
-        unsigned int m_VertexArray;
-        std::unique_ptr<Shader> shader;
-        std::unique_ptr<VertexBuffer> m_VertexBuffer;
-        std::unique_ptr<IndexBuffer> m_IndexBuffer;
+        std::shared_ptr<Shader> shader2;
+        std::shared_ptr<VertexArray> m_SquareVA;
     private:
         static Application* s_Instance;
     };
