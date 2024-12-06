@@ -6,10 +6,6 @@
 #include "Engine/Events/ApplicationEvent.h"
 #include "Engine/ImGui/ImGuiLayer.h"
 
-#include "Engine/Renderer/Shader.h"
-#include "Engine/Renderer/Buffer.h"
-#include "Engine/Renderer/VertexArray.h"
-
 namespace FS {
 
     class FS_API Application{
@@ -36,11 +32,6 @@ namespace FS {
         bool m_Running = true;
         LayerStack m_LayerStack;
         
-        std::shared_ptr<Shader> shader;
-        std::shared_ptr<VertexArray> m_VertexArray;
-
-        std::shared_ptr<Shader> shader2;
-        std::shared_ptr<VertexArray> m_SquareVA;
     private:
         static Application* s_Instance;
     };

@@ -2,6 +2,15 @@
 #include "Renderer.h"
 
 namespace FS {
+    void Renderer::BeginScene(){
 
-    RendererAPI Renderer::s_RendererAPI = RendererAPI::OpenGL;
+    }
+
+    void Renderer::EndScene(){
+    }
+
+    void Renderer::Submit(const std::shared_ptr<VertexArray> &vertexArray){
+
+        RenderCommand::DrawIndexed(vertexArray);
+    }
 }
