@@ -2,6 +2,10 @@
 #include "Application.h"
 #include "Input.h"
 
+#include "Engine/Renderer/Renderer.h"
+
+#include <GLFW/glfw3.h> // temp
+
 namespace FS {
 
     Application* Application::s_Instance = nullptr;
@@ -10,8 +14,10 @@ namespace FS {
         FS_CORE_ASSERT(!s_Instance, "Application already exists!");
         s_Instance = this;
 
-        m_Window = std::unique_ptr<Window>(Window::Create());
+        m_Window = Scope<Window>(Window::Create());
         m_Window->SetEventCallback(BIND_EVENT_FN(Application::OnEvent));
+
+        Renderer::Init();
 
         m_ImGuiLayer = new ImGuiLayer();
         PushOverlay(m_ImGuiLayer);
@@ -47,8 +53,11 @@ namespace FS {
 
         while(m_Running){            
 
+            float time = (float)glfwGetTime();
+            Timestep timestep = time - m_LastFrameTime;
+            m_LastFrameTime = time;
             for(Layer* layer : m_LayerStack)
-                layer->OnUpdate();
+                layer->OnUpdate(timestep);
 
             m_ImGuiLayer->Begin();
             for(Layer* layer : m_LayerStack)

@@ -5,7 +5,7 @@ add_definitions(-DGLFW_INCLUDE_NONE)
 # gather all source files
 file(GLOB_RECURSE sources ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
 file(GLOB_RECURSE headers ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h)
-add_library(${PROJECT_NAME} ${sources} ${headers} )
+add_library(${PROJECT_NAME} ${sources} ${headers} ${CMAKE_SOURCE_DIR}/Vendor/stb/stb_image.cpp )
 
 target_precompile_headers(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/fspch.h)
 
@@ -43,3 +43,14 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     # lua
     # sol2
 )
+
+# copy resources
+if(EXISTS ${CMAKE_SOURCE_DIR}/Resources)
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND 
+        ${CMAKE_COMMAND} -E copy_directory 
+        ${CMAKE_SOURCE_DIR}/Resources
+        ${EXECUTABLE_OUTPUT_PATH}/Resources
+    )
+else()
+    message(WARNING "[WARNING] no resource directory!")
+endif()

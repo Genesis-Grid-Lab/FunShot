@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #ifdef FS_PLATFORM_WINDOW
     #if defined(FS_BUILD_DLL)
         #define FS_API __declspec(dllexport)
@@ -27,3 +29,11 @@
 #define BIND_EVENT_FN(x) std::bind(&x, this, std::placeholders::_1)
 
 #define BIT(x) (1 << x)
+
+namespace FS {
+    template<typename T>
+    using Scope = std::unique_ptr<T>;
+
+    template<typename T>
+    using Ref = std::shared_ptr<T>;
+}
