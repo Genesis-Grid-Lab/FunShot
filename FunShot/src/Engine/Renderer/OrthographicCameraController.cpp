@@ -1,8 +1,8 @@
 #include "fspch.h"
 #include "OrthographicCameraController.h"
 
-#include "Engine/Input.h"
-#include "Engine/KeyCode.h"
+#include "Engine/Core/Input.h"
+#include "Engine/Core/KeyCode.h"
 
 
 namespace FS

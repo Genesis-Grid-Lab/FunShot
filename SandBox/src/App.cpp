@@ -1,4 +1,5 @@
 #include <FunShot.h>
+#include "Engine/Core/EntryPoint.h"
 
 #include <glm/vec3.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -6,6 +7,8 @@
 #include "imgui.h"
 
 #include "Platform/OpenGL/OpenGLShader.h"
+
+#include "Sandbox2D.h"
 
 class ExampleLayer : public FS::Layer {
 public:
@@ -68,7 +71,7 @@ public:
 
         auto texShader = m_ShaderLibrary.Load("Resources/Shaders/Texture.glsl");
 
-        m_Texture = FS::Texture2D::Create("Resources/board.png");
+        m_Texture = FS::Texture2D::Create("Resources/Textures/board.png");
 
         std::dynamic_pointer_cast<FS::OpenGLShader>(texShader)->Bind();
         std::dynamic_pointer_cast<FS::OpenGLShader>(texShader)->UploadUniformInt("u_Texture", 0);
@@ -115,6 +118,11 @@ public:
 
     void OnEvent(FS::Event& event) override {
         m_CameraController.OnEvent(event);
+
+        if(event.GetEventType() == FS::EventType::WindowResize)
+        {
+            auto& re = (FS::WindowResizeEvent&)event;
+        }
     }
 
 private:
@@ -135,7 +143,8 @@ private:
 class SandBox : public FS::Application{
 public:
     SandBox(){
-        PushLayer(new ExampleLayer());
+        // PushLayer(new ExampleLayer());
+        PushLayer(new Sandbox2D());
     }
     ~SandBox() {}
 };

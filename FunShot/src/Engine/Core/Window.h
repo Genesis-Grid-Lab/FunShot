@@ -2,7 +2,7 @@
 
 #include "fspch.h"
 
-#include "Engine/Core.h"
+#include "Engine/Core/Core.h"
 #include "Engine/Events/Event.h"
 
 namespace FS {

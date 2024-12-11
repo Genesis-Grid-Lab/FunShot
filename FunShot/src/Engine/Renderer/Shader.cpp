@@ -8,7 +8,7 @@ namespace FS {
     Ref<Shader> Shader::Create(const std::string &filePath){
         switch(Renderer::GetAPI()){
             case RendererAPI::API::None:         FS_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
-            case RendererAPI::API::OpenGL:       return  std::make_shared<OpenGLShader>(filePath);
+            case RendererAPI::API::OpenGL:       return  CreateRef<OpenGLShader>(filePath);
         }
 
         FS_CORE_ASSERT(false, "Unknown RendererAPI!");
@@ -18,7 +18,7 @@ namespace FS {
     Ref<Shader> Shader::Create(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc){
         switch(Renderer::GetAPI()){
             case RendererAPI::API::None:         FS_CORE_ASSERT(false, "RendererAPI::None is currently not supported!"); return nullptr;
-            case RendererAPI::API::OpenGL:       return std::make_shared<OpenGLShader>(name, vertexSrc,fragmentSrc);
+            case RendererAPI::API::OpenGL:       return CreateRef<OpenGLShader>(name, vertexSrc,fragmentSrc);
         }
 
         FS_CORE_ASSERT(false, "Unknown RendererAPI!");
