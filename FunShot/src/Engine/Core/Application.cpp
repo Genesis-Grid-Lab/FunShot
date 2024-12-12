@@ -11,6 +11,8 @@ namespace FS {
     Application* Application::s_Instance = nullptr;
 
     Application::Application(){
+        FS_PROFILE_FUNCTION();
+
         FS_CORE_ASSERT(!s_Instance, "Application already exists!");
         s_Instance = this;
 
@@ -23,20 +25,25 @@ namespace FS {
         PushOverlay(m_ImGuiLayer);
 
     }
-    Application::~Application(){}
+    Application::~Application(){
+        FS_PROFILE_FUNCTION();
+        Renderer::Shutdown();
+    }
 
     void Application::PushLayer(Layer* layer){
+        FS_PROFILE_FUNCTION();
         m_LayerStack.PushLayer(layer);
         layer->OnAttach();
     }
 
     void Application::PushOverlay(Layer* layer){
+        FS_PROFILE_FUNCTION();
         m_LayerStack.PushOverlay(layer);
         layer->OnAttach();
     }
 
     void Application::OnEvent(Event& e){
-
+        FS_PROFILE_FUNCTION();
         EventDispatcher dispatcher(e);
         dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(Application::OnWindowClose));
         dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(Application::OnWindowResize));
@@ -51,24 +58,30 @@ namespace FS {
     }
 
     void Application::Run(){
-
+        FS_PROFILE_FUNCTION();
         while(m_Running){            
-
+            FS_PROFILE_SCOPE("RunLoop");
             float time = (float)glfwGetTime();
             Timestep timestep = time - m_LastFrameTime;
             m_LastFrameTime = time;
 
             if(!m_Minimized){
-
-                for(Layer* layer : m_LayerStack)
-                    layer->OnUpdate(timestep);
+                {
+                    FS_PROFILE_SCOPE("LayerStack OnUpdate");
+                    for(Layer* layer : m_LayerStack)
+                        layer->OnUpdate(timestep);
+                }
             }
             m_ImGuiLayer->Begin();
-            for(Layer* layer : m_LayerStack)
-                layer->OnImGuiRender();
+            {
+                FS_PROFILE_SCOPE("LayerStack OnImGuiRender");
+                for(Layer* layer : m_LayerStack)
+                    layer->OnImGuiRender();
+            }
             m_ImGuiLayer->End();
 
             m_Window->OnUpdate();
+                
         }
     }
 
@@ -79,7 +92,7 @@ namespace FS {
     }
 
     bool Application::OnWindowResize(WindowResizeEvent &e){
-
+        FS_PROFILE_FUNCTION();
         if(e.GetWidth() == 0 || e.GetHeight() == 0){
 
             m_Minimized = true;

@@ -10,7 +10,7 @@ namespace FS {
     }
 
     void OpenGLContext::Init(){
-
+        FS_PROFILE_FUNCTION();
         glfwMakeContextCurrent(m_WindowHandle);
         int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
         FS_CORE_ASSERT(status, "Failed to init Glad!");
@@ -25,6 +25,7 @@ namespace FS {
     }
 
     void OpenGLContext::SwapBuffers(){
+        FS_PROFILE_FUNCTION();
         glfwSwapBuffers(m_WindowHandle);
     }
 }

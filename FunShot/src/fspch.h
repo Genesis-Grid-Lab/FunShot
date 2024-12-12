@@ -14,6 +14,7 @@
 #include <unordered_set>
 
 #include "Engine/Core/Log.h"
+#include "Engine/Debug/Instrumentor.h"
 
 #ifdef FS_PLATFORM_WINDOW
     #include <Windows.h>

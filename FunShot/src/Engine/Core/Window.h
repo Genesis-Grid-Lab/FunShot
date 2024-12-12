@@ -20,7 +20,7 @@ namespace FS {
     };
 
     //Interface repesenting a desktop based Window
-    class FS_API Window {
+    class  Window {
     public:
         using EventCallbackFn = std::function<void(Event&)>;
 

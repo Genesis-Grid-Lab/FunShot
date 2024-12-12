@@ -10,7 +10,7 @@
 
 namespace FS {
 
-    class FS_API Application{
+    class  Application{
     public:
         Application();
         virtual ~Application();

@@ -7,7 +7,7 @@
 
 namespace FS {
 
-    class FS_API LayerStack {
+    class  LayerStack {
     public:
         LayerStack();
         ~LayerStack();

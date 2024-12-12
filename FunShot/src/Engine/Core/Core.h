@@ -1,30 +1,25 @@
 #pragma once
 
+#include "Engine/Core/PlatformDetection.h"
+
 #include <memory>
 
-#ifdef FS_PLATFORM_WINDOW
-    #if defined(FS_BUILD_DLL)
-        #define FS_API __declspec(dllexport)
-    #elif defined(FS_NO_DLL)
-        #define FS_API
-    #else
-        #define FS_API __declspec(dllimport)
-    #endif
-#else
-    #error NO OTHER SUPPORT FOR NOW
-#endif
-
 #ifdef FS_DEBUG
-    #define FS_ENABLE_ASSERTS
+	#if defined(FS_PLATFORM_WINDOWS)
+		#define FS_DEBUGBREAK() __debugbreak()
+	#elif defined(FS_PLATFORM_LINUX)
+		#include <signal.h>
+		#define FS_DEBUGBREAK() raise(SIGTRAP)
+	#else
+		#error "Platform doesn't support debugbreak yet!"
+	#endif
+	#define FS_ENABLE_ASSERTS
+#else
+	#define FS_DEBUGBREAK()
 #endif
 
-#ifdef FS_ENABLE_ASSERTS
-    #define FS_ASSERT(x, ...) { if(!(x)) { FS_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak();} }
-    #define FS_CORE_ASSERT(x, ...) { if(!(x)) { FS_CORE_ERROR("Assertion Failed: {0}", __VA_ARGS__); __debugbreak();} }
-#else
-    #define FS_ASSERT(x, ...)
-    #define FS_CORE_ASSERT(x, ...)
-#endif
+#define FS_EXPAND_MACRO(x) x
+#define FS_STRINGIFY_MACRO(x) #x
 
 #define BIND_EVENT_FN(x) std::bind(&x, this, std::placeholders::_1)
 
@@ -45,3 +40,5 @@ namespace FS {
         return std::make_shared<T>(std::forward<Args>(args)...);
     }
 }
+
+#include "Engine/Core/Assert.h"

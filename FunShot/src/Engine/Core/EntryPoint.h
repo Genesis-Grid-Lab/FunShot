@@ -7,12 +7,17 @@ extern FS::Application* FS::CreateApplication();
 int main(int argc, char** argv){
 
     FS::Log::Init();
-    FS_CORE_WARN("init log!");
-    int a = 10;
-    FS_INFO("hello world {}", a);
+    FS_PROFILE_BEGIN_SESSION("Startup", "FSProfile-Startup.json");
     auto app = FS::CreateApplication();
+    FS_PROFILE_END_SESSION();
+
+    FS_PROFILE_BEGIN_SESSION("Runtime", "FSProfile-Runtime.json");
     app->Run();
+    FS_PROFILE_END_SESSION();
+
+    FS_PROFILE_BEGIN_SESSION("Shutdown", "FSProfile-Shutdown.json");
     delete app;
+    FS_PROFILE_END_SESSION();
 
     return 0;
 }

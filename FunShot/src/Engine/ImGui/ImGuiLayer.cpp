@@ -20,6 +20,7 @@ namespace FS {
     ImGuiLayer::~ImGuiLayer() {}
 
     void ImGuiLayer::OnAttach(){
+        FS_PROFILE_FUNCTION();
         // Setup Dear ImGui context
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
@@ -51,6 +52,7 @@ namespace FS {
     }
 
     void ImGuiLayer::OnDetach(){
+        FS_PROFILE_FUNCTION();
         ImGui_ImplOpenGL3_Shutdown();
         ImGui_ImplGlfw_Shutdown();
         ImGui::DestroyContext();
@@ -58,17 +60,17 @@ namespace FS {
 
     void ImGuiLayer::OnImGuiRender(){
 
-        static bool show = true;
-        ImGui::ShowDemoWindow(&show);
     }
 
     void ImGuiLayer::Begin(){
+        FS_PROFILE_FUNCTION();
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
     }
 
     void ImGuiLayer::End(){
+        FS_PROFILE_FUNCTION();
         ImGuiIO& io = ImGui::GetIO();
         Application& app = Application::Get();
         io.DisplaySize = ImVec2(app.GetWindow().GetWidth(), app.GetWindow().GetHeight());

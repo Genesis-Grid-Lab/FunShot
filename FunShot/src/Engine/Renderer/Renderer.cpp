@@ -7,6 +7,7 @@ namespace FS {
     Renderer::SceneData* Renderer::m_SceneData = new Renderer::SceneData;
 
     void Renderer::Init(){
+        FS_PROFILE_FUNCTION();
         RenderCommand::Init();
         Renderer2D::Init();
     }
@@ -21,6 +22,9 @@ namespace FS {
     }
 
     void Renderer::EndScene(){
+    }
+
+    void Renderer::Shutdown(){
     }
 
     void Renderer::Submit(const Ref<Shader>& shader, const Ref<VertexArray> &vertexArray, const glm::mat4& transform){

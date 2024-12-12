@@ -4,7 +4,7 @@
 
 namespace FS {
 
-    class FS_API WindowResizeEvent : public Event {
+    class  WindowResizeEvent : public Event {
     public:
         WindowResizeEvent(unsigned int width, unsigned int height)
             : m_Width(width), m_Height(height){}
@@ -24,14 +24,14 @@ namespace FS {
         unsigned int m_Width, m_Height;
     };
 
-    class FS_API WindowCloseEvent : public Event {
+    class  WindowCloseEvent : public Event {
     public:
         WindowCloseEvent() {}
         EVENT_CLASS_TYPE(WindowClose)
         EVENT_CLASS_CATEGORY(EventCategoryApplication)
     };
 
-    class FS_API AppTickEvent : public Event {
+    class  AppTickEvent : public Event {
     public:
         AppTickEvent() {}
 
@@ -39,7 +39,7 @@ namespace FS {
         EVENT_CLASS_CATEGORY(EventCategoryApplication)
     };
 
-    class FS_API AppUpdateEvent : public Event {
+    class  AppUpdateEvent : public Event {
     public:
         AppUpdateEvent() {}
 
@@ -47,7 +47,7 @@ namespace FS {
         EVENT_CLASS_CATEGORY(EventCategoryApplication)
     };
 
-    class FS_API AppRenderEvent : public Event {
+    class  AppRenderEvent : public Event {
     public:
         AppRenderEvent() {}
 

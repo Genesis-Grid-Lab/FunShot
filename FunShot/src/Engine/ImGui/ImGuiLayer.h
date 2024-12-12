@@ -7,7 +7,7 @@
 #include "Engine/Events/KeyEvent.h"
 
 namespace FS {
-    class FS_API ImGuiLayer : public Layer {
+    class  ImGuiLayer : public Layer {
     public:
         ImGuiLayer();
         ~ImGuiLayer();
