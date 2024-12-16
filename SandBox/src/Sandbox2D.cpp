@@ -8,7 +8,7 @@ Sandbox2D::Sandbox2D()
 
 void Sandbox2D::OnAttach()
 {
-    m_Texture = FS::Texture2D::Create("Resources/Textures/board.png");
+    m_Texture = FS::Texture2D::Create("Resources/Textures/Checkerboard.png");
 }
 
 void Sandbox2D::OnDetach(){
@@ -32,9 +32,11 @@ void Sandbox2D::OnUpdate(FS::Timestep ts){
         FS_PROFILE_SCOPE("Renderer draw");
         FS::Renderer2D::BeginScene(m_CameraController.GetCamera());
 
+        // FS::Renderer2D::DrawRotatedQuad({-1.0f, 0.0f}, {0.8f, 0.8f}, glm::radians(45.0f), {0.8f, 0.2f, 0.3f, 1.0f} );
         FS::Renderer2D::DrawQuad({-1.0f, 0.0f}, {0.8f, 0.8f}, {0.8f, 0.2f, 0.3f, 1.0f} );
         FS::Renderer2D::DrawQuad({0.5f, -0.5f}, {0.5f, 0.65f}, m_SquareColor );
-        FS::Renderer2D::DrawQuad({0.0f,0.0f, -0.1f}, {10.0f,10.0f}, m_Texture);
+        FS::Renderer2D::DrawQuad({-5.0f,-5.0f, -0.1f}, {10.0f,10.0f}, m_Texture, 10);
+        FS::Renderer2D::DrawQuad({-0.5f,-0.5f}, {1.0f,1.0f}, m_Texture, 20);
 
         FS::Renderer2D::EndScene();
     }
