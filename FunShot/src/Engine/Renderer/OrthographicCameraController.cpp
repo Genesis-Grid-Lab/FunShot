@@ -8,7 +8,7 @@
 namespace FS
 {
     OrthographicCameraController::OrthographicCameraController(float aspecRatio, bool rotation)
-        :m_AspecRatio(aspecRatio),m_Camera(-m_AspecRatio * m_ZoomLevel, m_AspecRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel), m_Rotation(rotation){
+        :m_AspectRatio(aspecRatio),  m_Bounds({ -m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel }), m_Camera(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel), m_Rotation(rotation){
     }
 
     void OrthographicCameraController::OnUpdate(Timestep ts){
@@ -42,17 +42,27 @@ namespace FS
         dispatcher.Dispatch<WindowResizeEvent>(BIND_EVENT_FN(OrthographicCameraController::OnWindowResized));
     }
 
-    bool OrthographicCameraController::OnMouseScrolled(MouseScrolledEvent &e){
+    void OrthographicCameraController::Resize(float width, float height){
+        m_AspectRatio = width / height;
+        CalculateView();
+    }
+
+    void OrthographicCameraController::CalculateView(){
+        m_Bounds = { -m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel };
+        m_Camera.SetProjection(-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel);
+    }
+
+    bool OrthographicCameraController::OnMouseScrolled(MouseScrolledEvent &e)
+    {
         FS_PROFILE_FUNCTION();
         m_ZoomLevel -= e.GetYOffset() * 0.5f;
         m_ZoomLevel = std::max(m_ZoomLevel, 0.25f);
-        m_Camera.SetProjection(-m_AspecRatio * m_ZoomLevel, m_AspecRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel);
+        CalculateView();
         return false;
     }
 
     bool OrthographicCameraController::OnWindowResized(WindowResizeEvent &e){
-        m_AspecRatio = (float)e.GetWidth() / (float)e.GetHeight();
-        m_Camera.SetProjection(-m_AspecRatio * m_ZoomLevel, m_AspecRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel);
+        Resize((float)e.GetWidth() , (float)e.GetHeight());
         return false;
     }
 

@@ -1,6 +1,8 @@
 #pragma once
 #include <FunShot.h>
 
+#include "ParticleSystem.h"
+
 class Sandbox2D : public FS::Layer {
 public:
     Sandbox2D();
@@ -17,5 +19,7 @@ private:
     FS::Ref<FS::VertexArray> m_SquareVA;
     glm::vec4 m_SquareColor = {0.2f,0.3f,0.8f, 1.0f};
     FS::Ref<FS::VertexArray> m_VertexArray;
+
+
     FS::Ref<FS::Texture2D> m_Texture;
 };

@@ -12,10 +12,12 @@ namespace FS {
 
     class  Application{
     public:
-        Application();
+        Application(const std::string& name = "FunShot App");
         virtual ~Application();
 
         void Run();
+
+        void Close() { m_Running = false;}
 
         void OnEvent(Event& e);
 
@@ -23,7 +25,7 @@ namespace FS {
         void PushOverlay(Layer* layer);
 
         inline Window& GetWindow() { return *m_Window;}
-        inline ImGuiLayer& GetImGuiLayer() { return *m_ImGuiLayer;}
+        inline ImGuiLayer* GetImGuiLayer() { return m_ImGuiLayer;}
 
         inline static Application& Get(){ return *s_Instance;}
     private:

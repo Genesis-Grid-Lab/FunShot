@@ -16,6 +16,6 @@
 #include "Engine/Core/Log.h"
 #include "Engine/Debug/Instrumentor.h"
 
-#ifdef FS_PLATFORM_WINDOW
+#ifdef FS_PLATFORM_WINDOWS
     #include <Windows.h>
 #endif

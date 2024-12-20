@@ -62,6 +62,15 @@ namespace FS {
 
     }
 
+    void ImGuiLayer::OnEvent(Event &e){
+        if(m_BlockEvents){
+            ImGuiIO& io = ImGui::GetIO();
+            e.m_Handled |= e.IsInCategory(EventCategoryMouse) & io.WantCaptureMouse;
+            e.m_Handled |= e.IsInCategory(EventCategoryKeyboard) & io.WantCaptureKeyboard;
+        }
+        
+    }
+
     void ImGuiLayer::Begin(){
         FS_PROFILE_FUNCTION();
         ImGui_ImplOpenGL3_NewFrame();

@@ -48,4 +48,5 @@ add_subdirectory(Vendor/spdlog)
 # add_subdirectory(Vendor/yaml-cpp)
 
 add_subdirectory(Funshot)
+add_subdirectory(FunshotEditor)
 add_subdirectory(SandBox)

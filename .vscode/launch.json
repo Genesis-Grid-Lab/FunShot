@@ -6,8 +6,8 @@
         {
             "type": "cppvsdbg",
             "request": "launch",
-            "name": "Editor Win32",
-            "program": "SandBox.exe",
+            "name": "Editor",
+            "program": "Editor.exe",
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}/Targets/Debug/bin",
         },
@@ -15,8 +15,8 @@
         {
             "type": "cppvsdbg",
             "request": "launch",
-            "name": "Game Win32",
-            "program": "Game.exe",
+            "name": "SandBox",
+            "program": "SandBox.exe",
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}/Targets/Debug/bin",
         },
