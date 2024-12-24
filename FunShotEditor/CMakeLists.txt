@@ -1,23 +1,46 @@
-project(FunShot)
+project(FunShotEditor)
 
-# gather source files
+# gather all source files
 file(GLOB_RECURSE sources ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 file(GLOB_RECURSE headers ${CMAKE_CURRENT_SOURCE_DIR}/*.h)
 add_executable(${PROJECT_NAME} ${sources} ${headers})
 
-# include directories
-target_include_directories(${PROJECT_NAME} PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/src
+
+# export engine symbols
+target_compile_definitions(${PROJECT_NAME} PUBLIC 
+)
+
+# includes directories
+target_include_directories(${PROJECT_NAME} PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/Editor
+    ${CMAKE_SOURCE_DIR}/FunShotEngine/include
+    # ${CMAKE_SOURCE_DIR}/Vendor/raylib/src
+    # ${CMAKE_SOURCE_DIR}/Vendor/raylib-cpp/include
+    # ${CMAKE_SOURCE_DIR}/Vendor/spdlog/include
+    # ${CMAKE_SOURCE_DIR}/Vendor/imgui
+    # ${CMAKE_SOURCE_DIR}/Vendor/rImGui
+    # ${CMAKE_SOURCE_DIR}/Vendor/entt/src
+    # ${CMAKE_SOURCE_DIR}/Vendor/imgui/backends
+)
+
+# link directories
+target_link_directories(${PROJECT_NAME} PUBLIC 
 )
 
 # link libraries
-target_link_libraries(${PROJECT_NAME} PRIVATE
-    Engine
+target_link_libraries(${PROJECT_NAME} PUBLIC
+    FunShotEngine
 )
 
-# add the /bigobj flag for Visual Studio builds
-if(MSVC)
-    target_compile_options(${PROJECT_NAME} PRIVATE "/bigobj")
+
+# copy resources
+if(EXISTS ${CMAKE_SOURCE_DIR}/Resources)
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND 
+        ${CMAKE_COMMAND} -E copy_directory 
+        ${CMAKE_SOURCE_DIR}/Resources
+        ${EXECUTABLE_OUTPUT_PATH}/Resources
+    )
+else()
+    message(WARNING "[WARNING] no resource directory!")
 endif()
-
-

@@ -80,7 +80,20 @@
         "xmemory": "cpp",
         "xtr1common": "cpp",
         "xtree": "cpp",
-        "xutility": "cpp"
+        "xutility": "cpp",
+        "any": "cpp",
+        "future": "cpp",
+        "regex": "cpp",
+        "cinttypes": "cpp",
+        "complex": "cpp",
+        "coroutine": "cpp",
+        "cstdarg": "cpp",
+        "memory_resource": "cpp",
+        "numeric": "cpp",
+        "stack": "cpp",
+        "typeindex": "cpp",
+        "cassert": "cpp",
+        "*.m": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

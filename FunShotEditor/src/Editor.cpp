@@ -1,46 +1,18 @@
-#include "Windows/Inspector.h"
-#include "Windows/Hierarchy.h"
-#include "Windows/Resource.h"
-#include "Windows/Viewport.h"
-#include "Windows/MenuBar.h"
+#include <FunShot.h>
+#include "EditorLayer.h"
 
-struct Editor : GuiContext
-{
-    GEN_INLINE void OnGuiStart() 
-    {
-       PostEvent<SelectEvent>((EntityID)4);
+namespace FS {
+    class Editor : public Application{
+    public:
+        Editor(){
+            PushLayer(new EditorLayer());
+        }
+        ~Editor() {}
+    };
 
-       AttachWindow<HierarchyWindow>();
-       AttachWindow<InspectorWindow>();
-       AttachWindow<ResourceWindow>();
-       AttachWindow<ViewportWindow>();
-       AttachWindow<MenuBarWindow>();
+
+    Application* CreateApplication(){
+        return new Editor();
     }
 
-    GEN_INLINE void OnGuiFrame()
-    {
-       /*if(ImGui::GetIO().MouseClicked[1])
-		{
-			/*for(auto& window : m_Window)
-			    window->OnShow(context);
-					
-       		ImGui::OpenPopup("my_select_popup");
-        	ImGui::SameLine();
-        						
-		}
-
-		if (ImGui::BeginPopup("my_select_popup"))
-        {
-            ImGui::EndPopup();
-        }*/ 
-    }
-};
-
-int32_t main(int32_t argc, char** argv) 
-{
-    auto app = new Application();
-    app->AttachLayer<Editor>();
-    app->RunContext(false);
-    GEN_DELETE(app);
-    return 0;
 }

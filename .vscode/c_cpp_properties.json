@@ -2,23 +2,14 @@
     "configurations": [
         {
             "includePath": [
+                "${workspaceFolder}/FunShotEditor/include",
                 "${workspaceFolder}/FunShotEngine/include",
-                "${workspaceFolder}/FunShotEditor/src",
-                "${workspaceFolder}/FunShotEditor/src/Vendors/imgui",
-                "${workspaceFolder}/FunShotGame/src",
-                "${workspaceFolder}/Vendor/assimp/include",
-                "${workspaceFolder}/Vendor/entt/src",
-                "${workspaceFolder}/Vendor/glew/include",
-                "${workspaceFolder}/Vendor/glfw/include",
-                "${workspaceFolder}/Vendor/glm",
-                "${workspaceFolder}/Vendor/stb",
-                "${workspaceFolder}/Vendor/spdlog/include",
-                "${workspaceFolder}/Vendor/magic_enum/include",
-                "${workspaceFolder}/Vendor/PhysX/physx/include",
-                "${workspaceFolder}/Vendor/PhysX/pxshared/include",
-                "${workspaceFolder}/Vendor/yaml-cpp",
-                "${workspaceFolder}/Vendor/lua",
-                "${workspaceFolder}/Vendor/sol2/include"
+                "${workspaceFolder}/FunShotGame/include",
+                "${workspaceFolder}/FunShotEngine/include/Core",
+                "${workspaceFolder}/FunShotEditor/include/Editor",
+                "${workspaceFolder}/Vendor/raylib/src",
+                "${workspaceFolder}/Vendor/raylib-cpp/include",
+                "${workspaceFolder}/Vendor/spdlog/include"
             ],
             "configurationProvider": "ms-vscode.cmake-tools",
             "defines": [

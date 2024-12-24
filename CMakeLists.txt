@@ -20,31 +20,16 @@ project(FunShotEngine)
 
 # enable console logging
 
-if(${CMAKE_BUILD_TYPE} MATCHES Debug)
-    add_definitions(-DGEN_ENABLE_LOG)
-endif(${CMAKE_BUILD_TYPE} MATCHES Debug)
 
-add_subdirectory(Vendor/glfw)
-add_subdirectory(Vendor/glew/build/cmake)
-add_subdirectory(Vendor/glm)
-add_subdirectory(Vendor/entt)
-add_subdirectory(Vendor/assimp)
+add_subdirectory(Vendor/raylib)
 add_subdirectory(Vendor/spdlog)
-add_subdirectory(Vendor/magic_enum)
-add_subdirectory(Vendor/lua)
-add_subdirectory(Vendor/sol2)
-set(BUILD_SHARED_LIBS ON)
-add_subdirectory(Vendor/yaml-cpp)
+add_subdirectory(Vendor/imgui)
+add_subdirectory(Vendor/raylib-cpp)
+add_subdirectory(Vendor/rImGui)
+add_subdirectory(Vendor/entt)
+
 
 # project subdirectories
-
 add_subdirectory(FunShotEngine)
 add_subdirectory(FunShotEditor)
-#add_subdirectory(FunShotGame)
-
-if (MSVC)
-  add_compile_options(/bigobj)
-  #target_compile_options(${PROJECT_NAME} PRIVATE /bigobj)
-else ()
-  add_compile_options(-Wa,-mbig-obj)
-endif ()
+add_subdirectory(FunShotGame)

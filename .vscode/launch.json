@@ -7,7 +7,7 @@
             "type": "cppvsdbg",
             "request": "launch",
             "name": "Editor Win32",
-            "program": "FunShot.exe",
+            "program": "FunShotEditor.exe",
             "console": "integratedTerminal",
             "cwd": "${workspaceFolder}/Targets/Debug/bin",
         },

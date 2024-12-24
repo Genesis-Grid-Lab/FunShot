@@ -4,7 +4,7 @@
 
 target="Targets/$1"
 
-# generate cmake build files
+# FSerate cmake build files
 
 cmake -S . -B $target -DCMAKE_BUILD_TYPE=$1
 
