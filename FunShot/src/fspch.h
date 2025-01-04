@@ -17,5 +17,8 @@
 #include "Engine/Debug/Instrumentor.h"
 
 #ifdef FS_PLATFORM_WINDOWS
+    #ifndef NOMINMAX
+    # define NOMINMAX
+    #endif
     #include <Windows.h>
 #endif

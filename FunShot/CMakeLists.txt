@@ -37,7 +37,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     glm
     spdlog
     imgui
-    # EnTT 
+    EnTT 
     # magic_enum
     # yaml-cpp
     # lua

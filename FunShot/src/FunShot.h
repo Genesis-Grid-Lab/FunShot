@@ -9,6 +9,11 @@
 
 #include "Engine/ImGui/ImGuiLayer.h"
 
+#include "Engine/Scene/Scene.h"
+#include "Engine/Scene/Entity.h"
+#include "Engine/Scene/ScriptableEntity.h"
+#include "Engine/Scene/Components.h"
+
 #include "Engine/Core/Timestep.h"
 
 #include "Engine/Renderer/RenderCommand.h"

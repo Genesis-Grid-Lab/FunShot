@@ -18,6 +18,47 @@ namespace FS {
         fbSpecification.Width = 1280;
         fbSpecification.Height = 720;
         m_Framebuffer = Framebuffer::Create(fbSpecification);
+
+        m_ActiveScene = CreateRef<Scene>();
+
+        auto square = m_ActiveScene->CreateEntity("Turquoise square");
+        square.AddComponent<SpriteRendererComponent>(glm::vec4{0.0f, 1.0f, 0.7f, 1.0f});
+
+        m_SquareEntity = square;
+
+        m_CameraEntity = m_ActiveScene->CreateEntity("Camera Entity");
+        m_CameraEntity.AddComponent<CameraComponent>();
+
+        m_SecondCamera = m_ActiveScene->CreateEntity("Second Camera");
+        auto& cc = m_SecondCamera.AddComponent<CameraComponent>();
+        cc.Primary = false;
+
+        class CameraController : public ScriptableEntity {
+        public:
+            void OnCreate(){                
+                
+            }
+
+            void OnDestroy(){
+
+            }
+
+            void OnUpdate(Timestep ts){
+                auto& transform = GetComponent<TransformComponent>().Transform;
+                float speed = 5.0f;
+                if(Input::IsKeyPressed(FS_KEY_A))
+                    transform[3][0] -= speed * ts;
+                if(Input::IsKeyPressed(FS_KEY_D))
+                    transform[3][0] += speed * ts;
+                if(Input::IsKeyPressed(FS_KEY_W))
+                    transform[3][1] += speed * ts;
+                if(Input::IsKeyPressed(FS_KEY_S))
+                    transform[3][1] -= speed * ts;
+            }
+        };
+        m_CameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();     
+        // m_SecondCamera.AddComponent<NativeScriptComponent>().Bind<CameraController>();  
+        m_SceneHierarachyPanel.SetContext(m_ActiveScene); 
     }
 
     void EditorLayer::OnDetach(){
@@ -25,46 +66,34 @@ namespace FS {
     }  
 
     void EditorLayer::OnUpdate(Timestep ts){
-
-        FS_PROFILE_FUNCTION();
-        {
-            FS_PROFILE_SCOPE("CameraController::OnUpdate");
-            if(m_ViewportFocused)
-                m_CameraController.OnUpdate(ts);
+        
+        FramebufferSpecification spec = m_Framebuffer->GetSpecification();
+        if(m_ViewportSize.x > 0.0f && m_ViewportSize.y > 0.0f &&
+            (spec.Width != m_ViewportSize.x || spec.Height != m_ViewportSize.y)){
+            
+            m_Framebuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+            m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);            
+        }         
+        if(m_ViewportSize.x > 0.0f && m_ViewportSize.y > 0.0f){
+            m_Framebuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+            m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);  
         }
 
-        Renderer2D::ResetStats();
-        {
-            FS_PROFILE_SCOPE("Renderer prep");
-            m_Framebuffer->Bind();
-            RenderCommand::SetClearColor({0.1,0.1,0.1,1});
-            RenderCommand::Clear();
-        }
 
-        {
-            static float rotation = 0.0f;
-            rotation += ts * 20.0f;
-            FS_PROFILE_SCOPE("Renderer draw");
-            Renderer2D::BeginScene(m_CameraController.GetCamera());
+                
+        if(m_ViewportFocused)
+            m_CameraController.OnUpdate(ts);        
 
-            Renderer2D::DrawRotatedQuad({1.0f, 0.0f}, {0.8f, 0.8f}, glm::radians(45.0f), {0.8f, 0.2f, 0.3f, 1.0f} );
-            Renderer2D::DrawQuad({-1.0f, 0.0f}, {0.8f, 0.8f}, {0.8f, 0.2f, 0.3f, 1.0f} );
-            Renderer2D::DrawQuad({0.5f, -0.5f}, {0.5f, 0.65f}, m_SquareColor );
-            Renderer2D::DrawQuad({0.0f,0.0f, -0.1f}, {20.0f,20.0f}, m_Texture, 10);
-            Renderer2D::DrawRotatedQuad({-0.5f,-0.5f}, {1.0f,1.0f}, glm::radians(rotation), m_Texture, 20);
+        Renderer2D::ResetStats();             
+        m_Framebuffer->Bind();
+        RenderCommand::SetClearColor({0.1,0.1,0.1,1});
+        RenderCommand::Clear();
+                 
+        //update scene
+        m_ActiveScene->OnUpdate(ts);
 
-            Renderer2D::EndScene();
-
-            Renderer2D::BeginScene(m_CameraController.GetCamera());
-            for(float y = -5.0f; y < 5.0f; y += 0.5f){
-                for(float x = -5.0f; x < 5.0f; x += 0.5f){
-                    glm::vec4 color = {(x + 5.0f) / 10.0f, 0.4f, (y + 5.0f) / 10.0f, 1.0f};
-                    Renderer2D::DrawQuad({x,y}, {0.45f, 0.45f}, color );
-                }
-            }
-            Renderer2D::EndScene();
-            m_Framebuffer->Unbind();
-        }
+        m_Framebuffer->Unbind();
+    
 
     }
 
@@ -136,6 +165,8 @@ namespace FS {
             ImGui::EndMenuBar();
         }
 
+        m_SceneHierarachyPanel.OnImGuiRender();
+
         ImGui::Begin("Settings");
 
         auto stats = FS::Renderer2D::GetStats();
@@ -145,7 +176,31 @@ namespace FS {
         ImGui::Text("Vertices: %d", stats.GetTotalVertexCount());
         ImGui::Text("Indices: %d", stats.GetTotalIndexCount());        
 
-        ImGui::ColorEdit3("Square Color", glm::value_ptr(m_SquareColor));
+        if(m_SquareEntity){
+            ImGui::Separator();
+            auto& tag = m_SquareEntity.GetComponent<TagComponent>().Tag;
+            ImGui::Text("%s", tag.c_str());
+
+            auto& squareColor = m_SquareEntity.GetComponent<SpriteRendererComponent>().Color;
+            ImGui::ColorEdit3("Square Color", glm::value_ptr(squareColor));
+            ImGui::Separator();
+        }
+
+        ImGui::DragFloat3("Camera Transform", glm::value_ptr(m_CameraEntity.GetComponent<TransformComponent>().Transform[3]));
+
+        if(ImGui::Checkbox("Camera A", &m_PrimaryCamera)){
+            m_CameraEntity.GetComponent<CameraComponent>().Primary = m_PrimaryCamera;
+            m_SecondCamera.GetComponent<CameraComponent>().Primary = !m_PrimaryCamera;
+        }
+
+        {
+            auto& camera = m_SecondCamera.GetComponent<CameraComponent>().Camera;
+            float orthoSize = camera.GetOrthoSize();
+            if(ImGui::DragFloat("Second Camera Ortho Size", &orthoSize)){
+                camera.SetOrthoSize(orthoSize);
+            }
+        }
+
         ImGui::End();
 
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{0,0});

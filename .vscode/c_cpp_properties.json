@@ -10,6 +10,7 @@
                 "${workspaceFolder}/Vendor/glm",
                 "${workspaceFolder}/Vendor/glad/include",
                 "${workspaceFolder}/Vendor/stb",
+                "${workspaceFolder}/Vendor/entt/src",
                 "${workspaceFolder}/Vendor/spdlog/include",
                 "${workspaceFolder}/Vendor/magic_enum/include",
                 "${workspaceFolder}/Vendor/PhysX/physx/include",

@@ -1,5 +1,6 @@
 #pragma once
 #include <FunShot.h>
+#include "Panels/SceneHierarchyPanel.h"
 
 namespace FS {
 
@@ -21,10 +22,20 @@ namespace FS {
         Ref<VertexArray> m_VertexArray;
 
         Ref<Framebuffer> m_Framebuffer;
+
+        Ref<Scene> m_ActiveScene;
+        Entity m_SquareEntity;
+
+        Entity m_CameraEntity;
+        Entity m_SecondCamera;
+
+        bool m_PrimaryCamera = true;
         
         glm::vec2 m_ViewportSize;
         bool m_ViewportFocused = false, m_ViewportHovered = false;
 
         Ref<Texture2D> m_Texture;
+
+        SceneHierarachyPanel m_SceneHierarachyPanel;
     };
 }
