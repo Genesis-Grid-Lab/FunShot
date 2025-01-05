@@ -15,8 +15,9 @@
                 "${workspaceFolder}/Vendor/magic_enum/include",
                 "${workspaceFolder}/Vendor/PhysX/physx/include",
                 "${workspaceFolder}/Vendor/PhysX/pxshared/include",
-                "${workspaceFolder}/Vendor/yaml-cpp",
+                "${workspaceFolder}/Vendor/yaml-cpp/include",
                 "${workspaceFolder}/Vendor/lua",
+                "${workspaceFolder}/Vendor/ImGuizmo",
                 "${workspaceFolder}/Vendor/sol2/include"
             ],
             "configurationProvider": "ms-vscode.cmake-tools",

@@ -11,6 +11,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     ${CMAKE_SOURCE_DIR}/FunShot/src/Engine
     ${CMAKE_SOURCE_DIR}/Vendor/glm
     ${CMAKE_SOURCE_DIR}/Vendor/imgui
+    ${CMAKE_SOURCE_DIR}/Vendor/ImGuizmo
 )
 
 # link libraries

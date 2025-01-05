@@ -3,9 +3,30 @@ project(FunShot)
 add_definitions(-DGLFW_INCLUDE_NONE)
 
 # gather all source files
-file(GLOB_RECURSE sources ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
+file(GLOB_RECURSE engineFile ${CMAKE_CURRENT_SOURCE_DIR}/src/Engine/*.cpp)
+if(WIN32)
+    file(GLOB_RECURSE windowFile ${CMAKE_CURRENT_SOURCE_DIR}/src/Platform/Windows/*.cpp)
+else()
+    file(GLOB_RECURSE windowFile )
+endif(WIN32)
+if(UNIX)
+    file(GLOB_RECURSE linuxFile ${CMAKE_CURRENT_SOURCE_DIR}/src/Platform/Linux/*.cpp)
+else()
+    file(GLOB_RECURSE linuxFile )
+endif(UNIX)
+if(APPLE)
+    file(GLOB_RECURSE macFile ${CMAKE_CURRENT_SOURCE_DIR}/src/Platform/Mac/*.cpp)
+else()
+    file(GLOB_RECURSE macFile )
+endif()
+
+file(GLOB_RECURSE openGLFile ${CMAKE_CURRENT_SOURCE_DIR}/src/Platform/OpenGL/*.cpp)
 file(GLOB_RECURSE headers ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h)
-add_library(${PROJECT_NAME} ${sources} ${headers} ${CMAKE_SOURCE_DIR}/Vendor/stb/stb_image.cpp )
+
+file(GLOB ImGuizmo ${CMAKE_SOURCE_DIR}/Vendor/ImGuizmo/ImGuizmo.cpp)
+file(GLOB ImGuizmoH ${CMAKE_SOURCE_DIR}/Vendor/ImGuizmo/ImGuizmo.h)
+
+add_library(${PROJECT_NAME} ${engineFile} ${windowFile} ${linuxFile} ${macFile} ${openGLFile} ${headers} ${ImGuizmoH} ${CMAKE_SOURCE_DIR}/Vendor/stb/stb_image.cpp ${ImGuizmo} )
 
 target_precompile_headers(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/fspch.h)
 
@@ -25,6 +46,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     ${CMAKE_SOURCE_DIR}/Vendor/PhysX/pxshared/include
     ${CMAKE_SOURCE_DIR}/Vendor/yaml-cpp
     ${CMAKE_SOURCE_DIR}/Vendor/imgui
+    ${CMAKE_SOURCE_DIR}/Vendor/ImGuizmo
     ${CMAKE_SOURCE_DIR}/Vendor/imgui/backends
     ${CMAKE_SOURCE_DIR}/Vendor/sol2/include
 )
@@ -39,7 +61,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     imgui
     EnTT 
     # magic_enum
-    # yaml-cpp
+    yaml-cpp
     # lua
     # sol2
 )

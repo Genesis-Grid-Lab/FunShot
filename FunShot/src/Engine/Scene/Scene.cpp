@@ -8,7 +8,6 @@
 namespace FS {
 
     Scene::Scene(){
-
     }
 
     Scene::~Scene(){
@@ -23,7 +22,27 @@ namespace FS {
         return entity;
     }
 
-    void Scene::OnUpdate(Timestep ts){
+    void Scene::DestroyEntity(Entity entity){
+        m_Registry.destroy(entity);
+    }
+
+    void Scene::OnUpdateEditor(Timestep ts, EditorCamera &camera){
+
+        Renderer2D::BeginScene(camera);
+
+            auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
+            for(auto entity : group){
+
+                auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+                Renderer2D::DrawQuad(transform.GetTransform(), sprite.Color);                
+            }
+
+        Renderer2D::EndScene();
+
+    }
+
+    void Scene::OnUpdateRuntime(Timestep ts)
+    {
 
         //update scripts
         {
@@ -41,7 +60,7 @@ namespace FS {
 
         //render 2d
         Camera* mainCamera = nullptr;
-        glm::mat4* mainTransform = nullptr;
+        glm::mat4 mainTransform;
         {
             auto view = m_Registry.view<TransformComponent, CameraComponent>();
             for(auto entity : view){
@@ -49,25 +68,24 @@ namespace FS {
                 
                 if(camera.Primary){
                     mainCamera = &camera.Camera;
-                    mainTransform = &transform.Transform;
+                    mainTransform = transform.GetTransform();
                     break;
                 }
             }
         }
 
         if(mainCamera){
-            Renderer2D::BeginScene(mainCamera->GetProjection(), *mainTransform);
+            Renderer2D::BeginScene(mainCamera->GetProjection(), mainTransform);
 
             auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
             for(auto entity : group){
 
                 auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
-                Renderer2D::DrawQuad(transform, sprite.Color);
+                Renderer2D::DrawQuad(transform.GetTransform(), sprite.Color);                
             }
 
             Renderer2D::EndScene();
         }
-
     }
 
     void Scene::OnViewportResize(uint32_t width, uint32_t height){
@@ -81,5 +99,48 @@ namespace FS {
                 cameraComponent.Camera.SetViewportSize(width, height);
             }
         }
+    }
+
+    Entity Scene::GetPrimaryCameraEntity()
+    {
+        auto view = m_Registry.view<CameraComponent>();
+        for(auto entity : view){
+
+            const auto& camera = view.get<CameraComponent>(entity);
+            if(camera.Primary)
+                return Entity{entity, this};
+        }
+
+        return {};
+    }
+
+    template<typename T>
+    void Scene::OnComponentAdded(Entity entity, T& component){
+        static_assert(false);
+    }
+
+    template<>
+    void Scene::OnComponentAdded<TransformComponent>(Entity entity, TransformComponent& component){
+
+    }
+
+    template<>
+    void Scene::OnComponentAdded<CameraComponent>(Entity entity, CameraComponent& component){
+        component.Camera.SetViewportSize(m_ViewportWidth, m_ViewportHeight);
+    }
+
+    template<>
+    void Scene::OnComponentAdded<SpriteRendererComponent>(Entity entity, SpriteRendererComponent& component){
+
+    }
+
+    template<>
+    void Scene::OnComponentAdded<TagComponent>(Entity entity, TagComponent& component){
+
+    }
+
+    template<>
+    void Scene::OnComponentAdded<NativeScriptComponent>(Entity entity, NativeScriptComponent& component){
+
     }
 }

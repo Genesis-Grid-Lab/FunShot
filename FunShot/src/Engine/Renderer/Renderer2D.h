@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Engine/Renderer/Camera.h"
+#include "Engine/Renderer/EditorCamera.h"
 
 #include "Texture.h"
 #include "SubTexture2D.h"
@@ -13,6 +14,7 @@ namespace FS {
         static void Shutdown();
 
         static void BeginScene(const OrthographicCamera& camera);
+        static void BeginScene(const EditorCamera& camera);
         static void BeginScene(const Camera& camera, const glm::mat4& transform);
         static void EndScene();
 
@@ -47,6 +49,7 @@ namespace FS {
         static void ResetStats();
         static Statistics GetStats();
     private:
-        static void FlushAndReset();
+        static void StartBatch();
+        static void NextBatch();
     };
 }
