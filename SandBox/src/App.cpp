@@ -8,7 +8,7 @@
 
 #include "Platform/OpenGL/OpenGLShader.h"
 
-#include "Sandbox2D.h"
+#include "Test.h"
 
 class ExampleLayer : public FS::Layer {
 public:
@@ -142,13 +142,14 @@ private:
 
 class SandBox : public FS::Application{
 public:
-    SandBox(){
-        // PushLayer(new ExampleLayer());
-        PushLayer(new Sandbox2D());
+    SandBox(ApplicationCommandLineArgs args)
+        :Application("Test", args){
+        
+        PushLayer(new Test());
     }
     ~SandBox() {}
 };
 
-FS::Application* FS::CreateApplication(){
-    return new SandBox();
+FS::Application* FS::CreateApplication(ApplicationCommandLineArgs args){
+    return new SandBox(args);
 }

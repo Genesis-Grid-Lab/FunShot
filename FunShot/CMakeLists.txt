@@ -23,6 +23,8 @@ endif()
 file(GLOB_RECURSE openGLFile ${CMAKE_CURRENT_SOURCE_DIR}/src/Platform/OpenGL/*.cpp)
 file(GLOB_RECURSE headers ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h)
 
+file(GLOB VulkLib ${CMAKE_SOURCE_DIR}/Vendor/Vulkan/Lib/*.lib)
+
 file(GLOB ImGuizmo ${CMAKE_SOURCE_DIR}/Vendor/ImGuizmo/ImGuizmo.cpp)
 file(GLOB ImGuizmoH ${CMAKE_SOURCE_DIR}/Vendor/ImGuizmo/ImGuizmo.h)
 
@@ -35,7 +37,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Engine
     ${CMAKE_SOURCE_DIR}/Vendor/assimp/include
-    ${CMAKE_SOURCE_DIR}/Vendor/entt/src
+    ${CMAKE_SOURCE_DIR}/Vendor/entt/src/entt
     ${CMAKE_SOURCE_DIR}/Vendor/glad/include
     ${CMAKE_SOURCE_DIR}/Vendor/glfw/include
     ${CMAKE_SOURCE_DIR}/Vendor/glm
@@ -48,7 +50,8 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     ${CMAKE_SOURCE_DIR}/Vendor/imgui
     ${CMAKE_SOURCE_DIR}/Vendor/ImGuizmo
     ${CMAKE_SOURCE_DIR}/Vendor/imgui/backends
-    ${CMAKE_SOURCE_DIR}/Vendor/sol2/include
+    ${CMAKE_SOURCE_DIR}/Vendor/box2d/include
+    ${Vulkan_INCLUDE_DIRS}
 )
 
 
@@ -60,10 +63,10 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     spdlog
     imgui
     EnTT 
-    # magic_enum
+    ${Vulkan_LIBRARIES}  
+    ${VulkLib}     
     yaml-cpp
-    # lua
-    # sol2
+    box2d
 )
 
 # copy resources

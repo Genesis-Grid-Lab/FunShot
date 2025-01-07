@@ -1,5 +1,6 @@
 #pragma once
-#include "Engine/Renderer/Camera.h"
+
+#include "Engine/Renderer/OrthographicCamera.h"
 #include "Engine/Core/Timestep.h"
 
 #include "Engine/Events/ApplicationEvent.h"
@@ -7,45 +8,34 @@
 
 namespace FS {
 
-    struct OrthographicCameraBounds
+	class OrthographicCameraController
 	{
-		float Left, Right;
-		float Bottom, Top;
+	public:
+		OrthographicCameraController(float aspectRatio, bool rotation = false);
 
-		float GetWidth() { return Right - Left; }
-		float GetHeight() { return Top - Bottom; }
+		void OnUpdate(Timestep ts);
+		void OnEvent(Event& e);
+
+		void OnResize(float width, float height);
+
+		OrthographicCamera& GetCamera() { return m_Camera; }
+		const OrthographicCamera& GetCamera() const { return m_Camera; }
+
+		float GetZoomLevel() const { return m_ZoomLevel; }
+		void SetZoomLevel(float level) { m_ZoomLevel = level; }
+	private:
+		bool OnMouseScrolled(MouseScrolledEvent& e);
+		bool OnWindowResized(WindowResizeEvent& e);
+	private:
+		float m_AspectRatio;
+		float m_ZoomLevel = 1.0f;
+		OrthographicCamera m_Camera;
+
+		bool m_Rotation;
+
+		glm::vec3 m_CameraPosition = { 0.0f, 0.0f, 0.0f };
+		float m_CameraRotation = 0.0f; //In degrees, in the anti-clockwise direction
+		float m_CameraTranslationSpeed = 5.0f, m_CameraRotationSpeed = 180.0f;
 	};
 
-    class OrthographicCameraController {
-    public:
-        OrthographicCameraController(float aspecRatio, bool rotation = false);
-
-        void OnUpdate(Timestep ts);
-        void OnEvent(Event& e);
-
-        void Resize(float width, float height);
-
-        OrthographicCamera& GetCamera() { return m_Camera;}
-        const OrthographicCamera& GetCamera() const { return m_Camera;}
-        const OrthographicCameraBounds& GetBounds() const { return m_Bounds; }
-
-        void SetZoomLevel(float level){ m_ZoomLevel = level; CalculateView();}
-        float GEtZoomLevel() { return m_ZoomLevel;}
-    private:
-        void CalculateView();
-
-        bool OnMouseScrolled(MouseScrolledEvent& e);
-        bool OnWindowResized(WindowResizeEvent& e);   
-    private:
-        float m_AspectRatio;
-        float m_ZoomLevel = 1.0f;
-        OrthographicCamera m_Camera;
-        OrthographicCameraBounds m_Bounds;
-
-        bool m_Rotation;
-        glm::vec3 m_CameraPosition = {0.0f, 0.0f, 0.0f};
-        float m_CameraPositionSpeed = 5;
-        float m_CameraRotation = 0.0f;
-        float m_CameraRotationSpeed = 160.0f;
-    };
 }

@@ -16,7 +16,7 @@
                 "${workspaceFolder}/Vendor/PhysX/physx/include",
                 "${workspaceFolder}/Vendor/PhysX/pxshared/include",
                 "${workspaceFolder}/Vendor/yaml-cpp/include",
-                "${workspaceFolder}/Vendor/lua",
+                "${workspaceFolder}/Vendor/box2d/include",
                 "${workspaceFolder}/Vendor/ImGuizmo",
                 "${workspaceFolder}/Vendor/sol2/include"
             ],

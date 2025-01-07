@@ -16,5 +16,5 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 
 # link libraries
 target_link_libraries(${PROJECT_NAME} PUBLIC     
-    FunShot
+    FunShot    
 )

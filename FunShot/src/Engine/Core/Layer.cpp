@@ -1,10 +1,11 @@
 #include "fspch.h"
-#include "Layer.h"
+#include "Engine/Core/Layer.h"
 
 namespace FS {
 
-    Layer::Layer(const std::string& name)
-        :m_DebugName(name){}
-
-    Layer::~Layer(){}
+	Layer::Layer(const std::string& debugName)
+		: m_DebugName(debugName)
+	{
+	}
+	
 }

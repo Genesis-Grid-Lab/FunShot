@@ -15,12 +15,25 @@ set(CMAKE_CONFIGURATION_TYPES Debug Release)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS ON)
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_C_FLAGS_DEBUG "-g -DDEBUG")
+set(CMAKE_CXX_FLAGS_DEBUG "-g -DDEBUG")
+
+# 1. Set VULKAN_SDK_PATH in .env.cmake to target specific vulkan version
+if (DEFINED VULKAN_SDK_PATH)
+  set(Vulkan_INCLUDE_DIRS "${VULKAN_SDK_PATH}/Include") # 1.1 Make sure this include path is correct
+  set(Vulkan_LIBRARIES "${VULKAN_SDK_PATH}/Lib") # 1.2 Make sure lib path is correct
+  set(Vulkan_FOUND "True")
+else()
+  find_package(Vulkan REQUIRED) # throws error if could not find Vulkan
+  message(STATUS "Found Vulkan: $ENV{VULKAN_SDK}")
+endif()
+if (NOT Vulkan_FOUND)
+	message(FATAL_ERROR "Could not find Vulkan library!")
+else()
+	message(STATUS "Using vulkan lib at: ${Vulkan_LIBRARIES}")
+endif()
 
 project(FunShotEngine)
-
-if(WIN32)
-    add_definitions(-DFS_PLATFORM_WINDOW)
-endif(WIN32)
 
 add_definitions(-DFS_NO_DLL)
 
@@ -41,12 +54,17 @@ add_subdirectory(Vendor/glm)
 add_subdirectory(Vendor/entt)
 add_subdirectory(Vendor/imgui)
 add_subdirectory(Vendor/spdlog)
-# add_subdirectory(Vendor/magic_enum)
-# add_subdirectory(Vendor/lua)
-# add_subdirectory(Vendor/sol2)
+
+set(BOX2D_SAMPLES OFF)
+set(BOX2D_UNIT_TESTS OFF)
+set(BOX2D_BUILD_DOCS OFF)
+set(BOX2D_BUILD_UNIT_TESTS OFF)
+set(BOX2D_BUILD_TESTBED OFF)
+add_subdirectory(Vendor/box2d)
 # set(BUILD_SHARED_LIBS ON)
 set(YAML_CPP_BUILD_CONTRIB OFF)
 set(YAML_CPP_BUILD_TOOLS OFF)
+set(YAML_CPP_BUILD_TESTS OFF)
 add_subdirectory(Vendor/yaml-cpp)
 
 add_subdirectory(Funshot)

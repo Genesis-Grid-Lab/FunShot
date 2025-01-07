@@ -1,26 +1,29 @@
 #pragma once
 
+#include "Engine/Core/Base.h"
 #include "Engine/Scene/Scene.h"
-#include "Engine/Core/Core.h"
 #include "Engine/Scene/Entity.h"
 
 namespace FS {
 
-    class SceneHierarachyPanel{
-    public:
-        SceneHierarachyPanel() = default;
-        SceneHierarachyPanel(const Ref<Scene>& context);
+	class SceneHierarchyPanel
+	{
+	public:
+		SceneHierarchyPanel() = default;
+		SceneHierarchyPanel(const Ref<Scene>& scene);
 
-        void SetContext(const Ref<Scene>& context);
+		void SetContext(const Ref<Scene>& scene);
 
-        void OnImGuiRender();
+		void OnImGuiRender();
 
-        Entity GetSelectedEntity() const { return m_SelectionContext;}
-    private:
-        void DrawEntityNode(Entity entity);
-        void DrawComponents(Entity entity);
-    private:
-        Ref<Scene> m_Context;
-        Entity m_SelectionContext;
-    };
+		Entity GetSelectedEntity() const { return m_SelectionContext; }
+		void SetSelectedEntity(Entity entity);
+	private:
+		void DrawEntityNode(Entity entity);
+		void DrawComponents(Entity entity);
+	private:
+		Ref<Scene> m_Context;
+		Entity m_SelectionContext;
+	};
+
 }

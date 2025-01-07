@@ -88,7 +88,10 @@
         "cstdarg": "cpp",
         "future": "cpp",
         "memory_resource": "cpp",
-        "numeric": "cpp"
+        "numeric": "cpp",
+        "expected": "cpp",
+        "shared_mutex": "cpp",
+        "typeindex": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }

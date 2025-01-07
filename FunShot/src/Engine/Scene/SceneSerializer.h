@@ -4,7 +4,8 @@
 
 namespace FS {
 
-	class SceneSerializer{
+	class SceneSerializer
+	{
 	public:
 		SceneSerializer(const Ref<Scene>& scene);
 

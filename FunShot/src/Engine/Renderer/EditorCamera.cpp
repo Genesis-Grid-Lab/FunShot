@@ -2,8 +2,8 @@
 #include "EditorCamera.h"
 
 #include "Engine/Core/Input.h"
-#include "Engine/Core/KeyCode.h"
-// #include "Engine/Core/MouseCodes.h"
+#include "Engine/Core/KeyCodes.h"
+#include "Engine/Core/MouseCodes.h"
 
 #include <glfw/glfw3.h>
 
@@ -61,17 +61,17 @@ namespace FS {
 
 	void EditorCamera::OnUpdate(Timestep ts)
 	{
-		if (Input::IsKeyPressed(FS_KEY_LEFT_ALT))
+		if (Input::IsKeyPressed(Key::LeftAlt))
 		{
 			const glm::vec2& mouse{ Input::GetMouseX(), Input::GetMouseY() };
 			glm::vec2 delta = (mouse - m_InitialMousePosition) * 0.003f;
 			m_InitialMousePosition = mouse;
 
-			if (Input::IsMouseButtonPressed(FS_MOUSE_BUTTON_MIDDLE))
+			if (Input::IsMouseButtonPressed(Mouse::ButtonMiddle))
 				MousePan(delta);
-			else if (Input::IsMouseButtonPressed(FS_MOUSE_BUTTON_LEFT))
+			else if (Input::IsMouseButtonPressed(Mouse::ButtonLeft))
 				MouseRotate(delta);
-			else if (Input::IsMouseButtonPressed(FS_MOUSE_BUTTON_RIGHT))
+			else if (Input::IsMouseButtonPressed(Mouse::ButtonRight))
 				MouseZoom(delta.y);
 		}
 
@@ -81,7 +81,7 @@ namespace FS {
 	void EditorCamera::OnEvent(Event& e)
 	{
 		EventDispatcher dispatcher(e);
-		dispatcher.Dispatch<MouseScrolledEvent>(BIND_EVENT_FN(EditorCamera::OnMouseScroll));
+		dispatcher.Dispatch<MouseScrolledEvent>(FS_BIND_EVENT_FN(EditorCamera::OnMouseScroll));
 	}
 
 	bool EditorCamera::OnMouseScroll(MouseScrolledEvent& e)

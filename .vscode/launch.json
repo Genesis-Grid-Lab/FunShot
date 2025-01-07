@@ -8,8 +8,14 @@
             "request": "launch",
             "name": "Editor",
             "program": "Editor.exe",
+            // "externalConsole": false,
             "console": "integratedTerminal",
+            "logging": {
+                "moduleLoad": false,
+                "trace": true
+            },
             "cwd": "${workspaceFolder}/Targets/Debug/bin",
+            "preLaunchTask": "FunShot-Debug"
         },
 
         {

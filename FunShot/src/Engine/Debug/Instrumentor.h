@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Engine/Core/Log.h"
-
 #include <algorithm>
 #include <chrono>
 #include <fstream>
@@ -10,6 +8,8 @@
 #include <thread>
 #include <mutex>
 #include <sstream>
+
+#include "Engine/Core/Log.h"
 
 namespace FS {
 
@@ -202,7 +202,7 @@ namespace FS {
 	}
 }
 
-#define FS_PROFILE 1
+#define FS_PROFILE 0
 #if FS_PROFILE
 	// Resolve which function signature macro will be used. Note that this only
 	// is resolved when the (pre)compiler starts, so the syntax highlighting

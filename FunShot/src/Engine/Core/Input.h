@@ -1,16 +1,20 @@
 #pragma once
 
-#include "Core.h"
+#include <glm/glm.hpp>
+
+#include "Engine/Core/KeyCodes.h"
+#include "Engine/Core/MouseCodes.h"
 
 namespace FS {
 
-    class  Input{
-    public:
-        static bool IsKeyPressed(int keycode);
-        static bool IsMouseButtonPressed(int button);
+	class Input
+	{
+	public:
+		static bool IsKeyPressed(KeyCode key);
 
-        static std::pair<float, float> GetMousePosition();
-        static float GetMouseX();
-        static float GetMouseY();
-    };
+		static bool IsMouseButtonPressed(MouseCode button);
+		static glm::vec2 GetMousePosition();
+		static float GetMouseX();
+		static float GetMouseY();
+	};
 }
