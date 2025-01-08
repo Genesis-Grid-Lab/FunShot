@@ -4,6 +4,9 @@
 #ifdef FS_PLATFORM_WINDOWS
 	#include "Platform/Windows/WindowsWindow.h"
 #endif
+#ifdef FS_PLATFORM_LINUX
+	#include "Platform/Linux/LinuxWindow.h"
+#endif
 
 namespace FS
 {
@@ -11,10 +14,13 @@ namespace FS
 	{
 	#ifdef FS_PLATFORM_WINDOWS
 		return CreateScope<WindowsWindow>(props);
-	#else
+	#endif
+	#ifdef FS_PLATFORM_LINUX
+	    return CreateScope<LinuxWindow>(props);
+	#endif
 		FS_CORE_ASSERT(false, "Unknown platform!");
 		return nullptr;
-	#endif
+	
 	}
 
 }

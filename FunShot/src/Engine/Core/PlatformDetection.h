@@ -33,7 +33,7 @@
 	#error "Android is not supported!"
 #elif defined(__linux__)
 	#define FS_PLATFORM_LINUX
-	#error "Linux is not supported!"
+	#error "Linux is not fully supported!"
 #else
 	/* Unknown compiler/platform */
 	#error "Unknown platform!"

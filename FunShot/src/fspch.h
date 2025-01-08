@@ -1,5 +1,7 @@
 #pragma once
 
+#define FMT_GCC_PRAGMA(...)
+
 #include <iostream>
 #include <memory>
 #include <utility>

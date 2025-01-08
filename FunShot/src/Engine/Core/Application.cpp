@@ -1,8 +1,6 @@
 #include "fspch.h"
 #include "Engine/Core/Application.h"
 
-#include "Engine/Core/Log.h"
-
 #include "Engine/Renderer/Renderer.h"
 
 #include "Engine/Core/Input.h"

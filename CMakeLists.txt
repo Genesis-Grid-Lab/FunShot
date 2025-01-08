@@ -15,8 +15,10 @@ set(CMAKE_CONFIGURATION_TYPES Debug Release)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS ON)
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_C_FLAGS_DEBUG "-g -DDEBUG")
-set(CMAKE_CXX_FLAGS_DEBUG "-g -DDEBUG")
+set(CMAKE_C_FLAGS_DEBUG "-g -DDEBUG -msse2")
+set(CMAKE_CXX_FLAGS_DEBUG "-g -DDEBUG -msse2")
+
+project(FunShotEngine CXX)
 
 # 1. Set VULKAN_SDK_PATH in .env.cmake to target specific vulkan version
 if (DEFINED VULKAN_SDK_PATH)
@@ -24,7 +26,7 @@ if (DEFINED VULKAN_SDK_PATH)
   set(Vulkan_LIBRARIES "${VULKAN_SDK_PATH}/Lib") # 1.2 Make sure lib path is correct
   set(Vulkan_FOUND "True")
 else()
-  find_package(Vulkan REQUIRED) # throws error if could not find Vulkan
+  find_package(Vulkan REQUIRED COMPONENTS glslc shaderc_combined SPIRV-Tools glslang) # throws error if could not find Vulkan
   message(STATUS "Found Vulkan: $ENV{VULKAN_SDK}")
 endif()
 if (NOT Vulkan_FOUND)
@@ -33,9 +35,17 @@ else()
 	message(STATUS "Using vulkan lib at: ${Vulkan_LIBRARIES}")
 endif()
 
+if(${Vulkan_SPIRV-Tools_FOUND})
+message(WARNING ${Vulkan_LIBRARIES} "yes" ${VULKAN_SDK} " "
+        ${Vulkan_SPIRV-Tools_LIBRARY} ""
+        )
+else()
+message(WARNING ${Vulkan_LIBRARIES} "no" ${VULKAN_SDK_PATH})
+endif()
+
 project(FunShotEngine)
 
-add_definitions(-DFS_NO_DLL)
+add_definitions(-DFS_NO_DLL )
 
 if(WIN32)    
     set(CMAKE_CXX_FLAGS_RELEASE "/wd4996")
@@ -48,25 +58,25 @@ if(${CMAKE_BUILD_TYPE} MATCHES Debug)
     add_definitions(-DFS_DEBUG)
 endif(${CMAKE_BUILD_TYPE} MATCHES Debug)
 
-add_subdirectory(Vendor/glfw)
-add_subdirectory(Vendor/glad)
-add_subdirectory(Vendor/glm)
-add_subdirectory(Vendor/entt)
-add_subdirectory(Vendor/imgui)
-add_subdirectory(Vendor/spdlog)
+add_subdirectory(${CMAKE_SOURCE_DIR}/Vendor/glfw)
+add_subdirectory(${CMAKE_SOURCE_DIR}/Vendor/glad)
+add_subdirectory(${CMAKE_SOURCE_DIR}/Vendor/glm)
+add_subdirectory(${CMAKE_SOURCE_DIR}/Vendor/entt)
+add_subdirectory(${CMAKE_SOURCE_DIR}/Vendor/imgui)
+add_subdirectory(${CMAKE_SOURCE_DIR}/Vendor/spdlog)
 
 set(BOX2D_SAMPLES OFF)
 set(BOX2D_UNIT_TESTS OFF)
 set(BOX2D_BUILD_DOCS OFF)
 set(BOX2D_BUILD_UNIT_TESTS OFF)
 set(BOX2D_BUILD_TESTBED OFF)
-add_subdirectory(Vendor/box2d)
+add_subdirectory(${CMAKE_SOURCE_DIR}/Vendor/box2d)
 # set(BUILD_SHARED_LIBS ON)
 set(YAML_CPP_BUILD_CONTRIB OFF)
 set(YAML_CPP_BUILD_TOOLS OFF)
 set(YAML_CPP_BUILD_TESTS OFF)
-add_subdirectory(Vendor/yaml-cpp)
+add_subdirectory(${CMAKE_SOURCE_DIR}/Vendor/yaml-cpp)
 
-add_subdirectory(Funshot)
-add_subdirectory(FunshotEditor)
+add_subdirectory(${CMAKE_SOURCE_DIR}/FunShot)
+add_subdirectory(${CMAKE_SOURCE_DIR}/FunShotEditor)
 # add_subdirectory(SandBox)

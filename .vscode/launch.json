@@ -34,7 +34,8 @@
             "name": "Editor Linux",
             "miDebuggerPath": "/usr/bin/gdb",
             "cwd": "/home/nesmy/GenDev/Targets/Debug/bin",
-            "program": "${workspaceFolder}/Targets/Debug/bin/FunShot",
+            "program": "${workspaceFolder}/Targets/Debug/bin/Editor",
+            "preLaunchTask": "FunShot-Debug"
         },
 
         {

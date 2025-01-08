@@ -23,7 +23,7 @@
             "configurationProvider": "ms-vscode.cmake-tools",
             "defines": [
                 "FS_NO_DLL",         
-                "FS_PLATFORM_WINDOW",
+                "FS_PLATFORM_WINDOW",                
                 "FS_DEBUG"
             ],
             "intelliSenseMode": "${default}",

@@ -38,6 +38,7 @@ namespace FS {
 		float fontSize = 18.0f;// *2.0f;
 		io.Fonts->AddFontFromFileTTF("Resources/Fonts/OpenSans/static/OpenSans-Bold.ttf", fontSize);
 		io.FontDefault = io.Fonts->AddFontFromFileTTF("Resources/Fonts/OpenSans/static/OpenSans-Regular.ttf", fontSize);
+		ImGui::LoadIniSettingsFromDisk("Resources/ImGui/imgui.ini");
 
 		// Setup Dear ImGui style
 		ImGui::StyleColorsDark();

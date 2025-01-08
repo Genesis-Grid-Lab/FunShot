@@ -23,7 +23,7 @@ endif()
 file(GLOB_RECURSE openGLFile ${CMAKE_CURRENT_SOURCE_DIR}/src/Platform/OpenGL/*.cpp)
 file(GLOB_RECURSE headers ${CMAKE_CURRENT_SOURCE_DIR}/src/*.h)
 
-file(GLOB VulkLib ${CMAKE_SOURCE_DIR}/Vendor/Vulkan/Lib/*.lib)
+file(GLOB VulkLib ${VULKAN_SDK}/lib/*.a )
 
 file(GLOB ImGuizmo ${CMAKE_SOURCE_DIR}/Vendor/ImGuizmo/ImGuizmo.cpp)
 file(GLOB ImGuizmoH ${CMAKE_SOURCE_DIR}/Vendor/ImGuizmo/ImGuizmo.h)
@@ -63,8 +63,15 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     spdlog
     imgui
     EnTT 
-    ${Vulkan_LIBRARIES}  
-    ${VulkLib}     
+    # Vulkan::Vulkan
+    # Vulkan::SPIRV-Tools
+    # Vulkan::shaderc_combined
+    # ${Vulkan_LIBRARIES}  
+    # ${Vulkan_shaderc_combined_LIBRARY}   
+    # ${Vulkan_glslang_LIBRARY}  
+    # ${Vulkan_SPIRV-Tools_LIBRARY}
+    # Vulkan::glslc
+    ${VulkLib}
     yaml-cpp
     box2d
 )

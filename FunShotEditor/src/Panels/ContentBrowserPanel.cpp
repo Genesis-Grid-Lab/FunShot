@@ -3,7 +3,18 @@
 
 #include <imgui.h>
 
+using namespace std;
+
 namespace FS {
+
+	wstring widen( const std::string& str )
+	{
+		wostringstream wstm ;
+		const ctype<wchar_t>& ctfacet = use_facet<ctype<wchar_t>>(wstm.getloc()) ;
+		for( size_t i=0 ; i<str.size() ; ++i ) 
+				wstm << ctfacet.widen( str[i] ) ;
+		return wstm.str() ;
+	}
 
 	// Once we have projects, change this
 	extern const std::filesystem::path g_AssetPath = "Resources";
@@ -51,7 +62,7 @@ namespace FS {
 
 			if (ImGui::BeginDragDropSource())
 			{
-				const wchar_t* itemPath = relativePath.c_str();
+				const wchar_t* itemPath = (wchar_t*)relativePath.c_str();
 				ImGui::SetDragDropPayload("CONTENT_BROWSER_ITEM", itemPath, (wcslen(itemPath) + 1) * sizeof(wchar_t));
 				ImGui::EndDragDropSource();
 			}
